@@ -1,0 +1,5 @@
+*.o
+*.c
+*.tmp
+**/datasets
+**/_pycache_
