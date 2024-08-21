@@ -1,5 +1,5 @@
 # GABA_puff_simulation_summer_2024
-
+Dendritic GABA puff simulation.
 
 
 ## How to start
