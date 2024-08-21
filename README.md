@@ -35,7 +35,7 @@ Input:
 The script combines the tiff files into a stack. The stack is saved in the input folder.
 
 Output:
-2) The saved stack.
+1) The saved stack.
 
 
 ### tau_different_pixel_size.py
@@ -102,7 +102,7 @@ Input:
 Generates figures. At the beginning of the file, the desired figures must be chosen. Be careful not to choose too many figures at the same time. This can cause memory issues and crash.
 
 Output:
-2) The chosen figures.
+1) The chosen figures.
 
 
 ### kcc2_nkcc1_grid_analysis.py
