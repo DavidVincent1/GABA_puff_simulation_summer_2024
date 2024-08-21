@@ -230,7 +230,7 @@ if anim_chlore == 1:
     plt.show()
     if save_anim_chlore == 1:
         writer = FFMpegWriter(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-        anim.save(f'Cl_{len(syn_pos)}synapses_kcc2={kcc2}_nkcc1={nkcc1}_-90mV.mp4', writer='ffmpeg')
+        anim.save('animation' + f'\Cl_{len(syn_pos)}synapses_kcc2={kcc2}_nkcc1={nkcc1}_-90mV.mp4', writer='ffmpeg')
 
 
 
@@ -382,7 +382,7 @@ if anim_icl == 1:
     plt.show()
     if save_anim_icl == 1:
         writer = FFMpegWriter(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-        anim.save(f'iCl_{len(syn_pos)}synapses_kcc2={kcc2}_nkcc1={nkcc1}_-20mV.mp4', writer='ffmpeg')
+        anim.save('animation' + f'\iCl_{len(syn_pos)}synapses_kcc2={kcc2}_nkcc1={nkcc1}_-20mV.mp4', writer='ffmpeg')
 
 
 
@@ -515,7 +515,7 @@ if anim_open_channels:
     plt.show()
     if save_anim_open_channels == 1:
         writer = FFMpegWriter(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-        anim.save(f'Open_states_{len(syn_pos)}synapses_kcc2={kcc2}_nkcc1={nkcc1}_-20mV.mp4', writer='ffmpeg')
+        anim.save('animation' + f'\Open_states_{len(syn_pos)}synapses_kcc2={kcc2}_nkcc1={nkcc1}_-20mV.mp4', writer='ffmpeg')
 
 
 
@@ -735,4 +735,4 @@ if anim_all_four:
     plt.show()
     if save_anim_all_four == 1:
         writer = FFMpegWriter(fps=20, metadata=dict(artist='Me'), bitrate=1800)
-        anim.save(f'All_four_{len(syn_pos)}synapses_kcc2={kcc2}_nkcc1={nkcc1}_-20mV.mp4', writer='ffmpeg')
+        anim.save('animation' + f'\All_four_{len(syn_pos)}synapses_kcc2={kcc2}_nkcc1={nkcc1}_-20mV.mp4', writer='ffmpeg')

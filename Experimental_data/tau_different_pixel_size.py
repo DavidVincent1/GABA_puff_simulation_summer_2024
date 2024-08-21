@@ -10,7 +10,8 @@ rcParams.update({'font.size': 22})
 
 
 # GABA puff intensity measurement file --------------------------------------------
-data = tifffile.imread(f'Données_expérimentales\Tiff Intensité\C1.tif')
+path = f'Experimental_data\Tiff Intensité\C1.tif'
+data = tifffile.imread(path)
 data_5pix = data[:, :int(data.shape[1]//5 * 5), :int(data.shape[2]//5 * 5), 0]
 data_10pix = data[:, :int(data.shape[1]//10 * 10), :int(data.shape[2]//10 * 10), 0]
 
@@ -46,7 +47,6 @@ im_check_10pix = np.zeros_like(im_no_time_10pix)
 # Arrays to stuck lifetime
 tau_5pix = np.zeros_like(im_no_time_5pix, dtype=np.float64)
 tau_10pix = np.zeros_like(im_no_time_10pix, dtype=np.float64)
-print(np.dtype(tau_5pix[0,0]))
 
 
 # Fit on all counts -------------------------------------------------------------------------------------------------------------
@@ -87,11 +87,11 @@ sst = np.sum((time_no_im_norm[max_ind:] - np.mean(time_no_im_norm[max_ind:])) **
 r_squared = 1 - (ssr / sst) # R^2
 
 print('Biexponential fit on all counts')
-print('tau  : ', popt_exp2[0])
-print('a    : ', popt_exp2[1])
-print('tau2 : ', popt_exp2[2])
-print('a2   : ', popt_exp2[3])
-print('R^2  : ', r_squared)
+print(r'tau  : ', popt_exp2[0])
+print(r'a    : ', popt_exp2[1])
+print(r'tau2 : ', popt_exp2[2])
+print(r'a2   : ', popt_exp2[3])
+print(r'R^2  : ', r_squared)
 print('')
 
 
@@ -254,6 +254,7 @@ print('Mean tau                   : ', for_mean_10pix.mean(), for_mean_10pix.std
 print('Mean R2                    : ', R_2_mean_10pix, R_2_for_mean_10pix.std())
 print('Mean R2 keeping best fits  : ', mean_with_high_R_2_10pix.mean(), mean_with_high_R_2_10pix.std())
 print('Mean tau keeping best fits : ', mean_tau_with_high_R_2_10pix.mean(), mean_tau_with_high_R_2_10pix.std())
+print('')
 
 
 # Graphs ---------------------------------------------------------------------------------------------------------
@@ -277,7 +278,7 @@ fig.colorbar(im2, ax=ax[1], orientation='vertical', fraction=0.046, pad=0.04, la
 
 # Show wich pixel was used to fit
 fig, ax = plt.subplots(2, 1)
-fig.canvas.manager.set_window_title('Fitted_pixels')
+fig.canvas.manager.set_window_title('Fited_pixels')
 ax[0].set_title("5 x 5 pixels")
 ax[0].imshow(im_check)
 ax[1].set_title("10 x 10 pixels")
@@ -286,7 +287,7 @@ ax[1].imshow(im_check_10pix)
 
 # Lifetime per pixel
 fig, ax = plt.subplots(2, 1)
-fig.canvas.manager.set_window_title('Fitted_pixels_tau')
+fig.canvas.manager.set_window_title('Fited_pixels_tau')
 ax[0].set_title("5 x 5 pixels")
 ax[1].set_title("10 x 10 pixels")
 images = []
@@ -327,6 +328,7 @@ plt.ylabel("Normalized intensity [-]")
 
 # Show all the curve fits
 fig, ax = plt.subplots(2, 1)
+fig.canvas.manager.set_window_title('Fited_pixels_all_curves')
 ax[0].set_title("Curve fit 5x5 pixels")
 for i,j in zip(time_pix, fit_pix):
     ax[0].plot(i, j)
@@ -342,6 +344,7 @@ ax[1].set_xlabel("Time [s]")
 # Pixel 10x10 : (10,20) and (3,33) -> ax[1,0] and ax[1,1]
 # This graph showes that pixel near the puff corresponds to better fit
 fig, ax = plt.subplots(2,2)
+fig.canvas.manager.set_window_title('Fit_near_and_far_from_puff')
 ax[0,0].set_title("5x5 pixel, near puff")
 ax[0,1].set_title("5x5 pixel, far from puff")
 ax[1,0].set_title("10x10 pixel, near puff")

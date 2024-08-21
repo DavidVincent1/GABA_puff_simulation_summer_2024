@@ -29,10 +29,12 @@ h.celsius = p.temperature
 
 
 # KCC2 and NKCC1 strenght lists -----------------------------------
-nb_kcc2 = 5  # the 2D grid will be nb_kcc2 x nb_nkcc1
-nb_nkcc1 = 5 # ^
-Ukcc2 = np.linspace(1e-4, 1e-5, nb_kcc2)   # Range of U_KCC2 values
-Unkcc1 = np.linspace(1e-5, 1e-4, nb_nkcc1) # Range of U_nkc1 values
+nb_kcc2 = 1  # the 2D grid will be nb_kcc2 x nb_nkcc1
+nb_nkcc1 = 1 # ^
+range_kcc2 = 1e-5, 1e-4
+range_nkcc1 = 1e-5, 1e-4
+Ukcc2 = np.linspace(range_kcc2[1], range_kcc2[0], nb_kcc2)   # Range of U_KCC2 values
+Unkcc1 = np.linspace(range_nkcc1[0], range_nkcc1[1], nb_nkcc1) # Range of U_nkc1 values
 
 
 # Arrays for results ---------------------------------
@@ -161,7 +163,7 @@ def collect_result(result):
     plt.plot(t, nai)
     plt.figure("Potassium steady state")
     plt.plot(t, ki)
-    plt.figure("Chlore steady state")
+    plt.figure("Chloride steady state")
     plt.plot(t, cli)
     plt.figure("Resting mp")
     plt.plot(t, v)
@@ -176,7 +178,7 @@ if __name__ == '__main__':
     fig2 = plt.figure("Potassium steady state")
     plt.ylabel(r"$[K^+]_i$ in soma [mM]")
     plt.xlabel("Time [ms]")
-    fig3 = plt.figure("Chlore steady state")
+    fig3 = plt.figure("Chloride steady state")
     plt.ylabel(r"$[Cl^-]_i$ in soma [mM]")
     plt.xlabel("Time [ms]")
     fig4 = plt.figure("Resting mp")
