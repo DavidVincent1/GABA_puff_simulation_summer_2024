@@ -75,6 +75,10 @@ Every parameter of the simulation are here. This file is used as an input for th
 The functions and classes used by other scripts are here.
 
 
+### HH_parameters_visualisation
+Show the x_{\infty} and \tau_{x} parameters of the Hudgkin-Huxley equations as a function of the membrane potential.
+
+
 ### GABA_puff_simulation.py
 Input:
 1) See 'parameters.py'.
