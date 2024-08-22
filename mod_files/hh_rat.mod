@@ -28,7 +28,7 @@ NEURON {
         USEION na READ ena WRITE ina REPRESENTS CHEBI:29101
         USEION k READ ek WRITE ik REPRESENTS CHEBI:29103
         NONSPECIFIC_CURRENT il
-        RANGE gnabar, gkbar, gl, el, gna, gk, Vt, Vs, ik, ina, il
+        RANGE gnabar, gkbar, gl, el, gna, gk, ik, ina, il
         : `GLOBAL minf` will be replaced with `RANGE minf` if CoreNEURON enabled
         GLOBAL minf, hinf, ninf, mtau, htau, ntau
         THREADSAFE : assigned GLOBALs will be per thread
@@ -39,8 +39,6 @@ PARAMETER {
         gkbar = .036 (S/cm2)    <0,1e9> : .035
         gl = .0003 (S/cm2)      <0,1e9>
         el = -54.3 (mV)
-        Vt = -58 (mV) :??
-        Vs = -10 (mV) :??
 }
 
 STATE {
@@ -103,29 +101,6 @@ PROCEDURE rates(v(mV)) {  :Computes rate and other constants at current v.
         TABLE minf, mtau, hinf, htau, ninf, ntau DEPEND celsius FROM -100 TO 100 WITH 200
 
 UNITSOFF
-        :q10 = 3^((celsius - 6.3)/10)
-
-        :        :"m" sodium activation system
-        :alpha = .32 * vtrap(-(v-Vt-13),5)
-        :beta =  0.28 * exp(-(v-Vt-40)/5)
-        :sum = alpha + beta
-        :mtau = 1/(q10*sum)
-        :minf = alpha/sum
-
-                :"h" sodium inactivation system
-        :alpha = .128 * exp(-(v-Vt-Vs-17)/18)
-        :beta = 4 / (exp(-(v-Vt-Vs-40)/5) + 1)
-        :sum = alpha + beta
-        :htau = 1/(q10*sum)
-        :hinf = alpha/sum
-
-                :"n" potassium activation system
-        :alpha = .0032*vtrap(-(v-Vt-15),5)
-        :beta = .5*exp(-(v-Vt-10)/40)
-        :sum = alpha + beta
-        :ntau = 1/(q10*sum)
-        :ninf = alpha/sum
-
         q10 = 3^((celsius - 23)/10)
 
                 :"m" sodium activation system
