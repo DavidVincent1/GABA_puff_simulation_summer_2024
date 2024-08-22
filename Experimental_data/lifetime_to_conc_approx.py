@@ -12,15 +12,18 @@ rcParams.update({'font.size': 22})
 
 
 # Experimental data --------------------------------------------------------------------------
+# INPUT 1
 # the data is a excel file
-indice = pd.read_excel("Données_expérimentales\Autres\lifetimes.xlsx", sheet_name=0)['ROI ID']
-data = pd.read_excel("Données_expérimentales\Autres\lifetimes.xlsx", sheet_name=1)
+path = "Données_expérimentales\Autres\lifetimes.xlsx"
+indice = pd.read_excel(path, sheet_name=0)['ROI ID']
+data = pd.read_excel(path, sheet_name=1)
 data = np.asarray(data) # excel -> np.array
 
 
 # Simulation results to compare with experimental data ----------------------------------------------------------------------------------------------------------------------------------
+# INPUT 2
 #f = h5py.file(r"Path of the dataset file", 'r')
-f = h5py.File(r"Multiple_syn_2024_07-31\comp_exp\svoltclamped_-90mV_syn_nb_26_sim_lenght_590000_dt_(5,0.144,0.144)_L_150.0_kcc2_1e-06_nkcc1_0.00015_rnum=[200]_puffconc=5_0.1.hdf5", 'r')
+f = h5py.File(r"Path of the dataset file", 'r')
 
 decal = 470000                # Offset to skip the initial stabilization of the simulation
 t_and_soma_v = f["mp_soma"]   # Time and MP in soma

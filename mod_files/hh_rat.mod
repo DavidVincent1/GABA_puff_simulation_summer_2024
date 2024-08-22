@@ -90,8 +90,6 @@ DERIVATIVE states {
         n' = (ninf-n)/ntau
 }
 
-:LOCAL q10
-
 
 ? rates
 PROCEDURE rates(v(mV)) {  :Computes rate and other constants at current v.

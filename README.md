@@ -7,7 +7,7 @@ Dendritic GABA puff simulation.
 
 2) Download the mod files which are in the 'mod_files' folder. To do so, go to the NEURON folder and open the 'mknrndll' file. Then, choose the destination of the folder containing the mod files and click on 'Make nrnmech.dll'.
 
-3) Read the rest of this README, the 'Equation_description.pdf' file and the 'fichiers_mod.pdf'.
+3) Read the rest of this README and, if you want more details, the 'Equation_description.pdf' and 'fichiers_mod.pdf' files in the 'documentation' folder.
 
 4) Use 'GABA_puff_simulation.py' or 'kcc2_nkcc1_grid_analysis.py' to run simulation.
 
@@ -20,7 +20,7 @@ This folder contains the experimental data (from Justin Hamel) analyzed during t
 Inputs:
 1) Excel sheet containing lifetime measurements in different segments of a dendrite.
 
-2) Simulation results (h5py dataset).
+2) Simulation results (HDF5 dataset).
 
 This script calculates an approximation of the chloride concentration. Both simulation results and experimental data are normalized by the maximum and the minimum of the combined arrays and are compared.
 
@@ -61,7 +61,7 @@ Outputs:
 
 
 ## mod_files folder
-The folder contains mod files essential to the model. See 'fichiers_mod.pdf' for more details on the way these files work. See 'Equation_description.pdf' for details on the mathematical equations. 
+The folder contains mod files essential to the model. See 'fichiers_mod.pdf' for more details on the way these files work. See 'Equation_description.pdf' for details on the mathematical equations. Both files are in the 'documentation' folder.
 
 
 ## The other scripts

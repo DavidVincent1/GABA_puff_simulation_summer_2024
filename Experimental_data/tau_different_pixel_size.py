@@ -9,7 +9,9 @@ from matplotlib import rcParams, colors
 rcParams.update({'font.size': 22})
 
 
-# GABA puff intensity measurement file --------------------------------------------
+# GABA puff intensity measurement file -----------------------------------------------------------------------------
+# INPUT
+# Path of a tiff file. Corresponds to a stack showing the photon counts associated to the GABA during an experiment.
 path = f'Experimental_data\Tiff Intensité\C1.tif'
 data = tifffile.imread(path)
 data_5pix = data[:, :int(data.shape[1]//5 * 5), :int(data.shape[2]//5 * 5), 0]

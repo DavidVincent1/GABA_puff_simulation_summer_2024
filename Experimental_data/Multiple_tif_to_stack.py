@@ -3,6 +3,7 @@ import tifffile
 import os
 
 
+# INPUT
 # Path of the folder where the  tiff files are located
 path = "Experimental_data\Tiff Intensité\C1"
 

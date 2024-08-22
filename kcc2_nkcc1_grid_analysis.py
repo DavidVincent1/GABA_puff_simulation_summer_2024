@@ -19,6 +19,7 @@ h.nrn_load_dll(r"mod_files\nrnmech.dll")
 h.load_file("stdrun.hoc")
 
 
+# INPUT 1
 # path where to save the pickle files. It makes it possible to edit the graphs later throught the
 # 'data_reader_pickle.py' file.
 filepath = r"pickle" 
@@ -29,10 +30,14 @@ h.celsius = p.temperature
 
 
 # KCC2 and NKCC1 strenght lists -----------------------------------
+# INPUT 2
 nb_kcc2 = 1  # the 2D grid will be nb_kcc2 x nb_nkcc1
 nb_nkcc1 = 1 # ^
+
+# INPUT 3
 range_kcc2 = 1e-5, 1e-4
 range_nkcc1 = 1e-5, 1e-4
+
 Ukcc2 = np.linspace(range_kcc2[1], range_kcc2[0], nb_kcc2)   # Range of U_KCC2 values
 Unkcc1 = np.linspace(range_nkcc1[0], range_nkcc1[1], nb_nkcc1) # Range of U_nkc1 values
 

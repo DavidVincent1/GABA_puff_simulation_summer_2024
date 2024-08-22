@@ -9,7 +9,7 @@ rcParams.update({'font.size': 22}) # Graph parameters
 
 
 # Loading mod files and for better simulation --------------------------
-h.nrn_load_dll(r"GABA_stim_simulation_VERSION_FINALE\mod_files\nrnmech")
+h.nrn_load_dll(r"mod_files\nrnmech")
 h.load_file("stdrun.hoc")
 
 

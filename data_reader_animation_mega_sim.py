@@ -12,8 +12,9 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 
 
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
+# INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-f = h5py.File(r"Multiple_syn_2024_07-31\comp_exp\svoltclamped_-90mV_syn_nb_26_sim_lenght_590000_dt_(5,0.144,0.144)_L_150.0_kcc2_0_nkcc1_0.00015_rnum=[200]_puffconc=5_2.0.hdf5", 'r')
+f = h5py.File(r"Path of the dataset file", 'r')
 
 
 # To see the keys of the datatset

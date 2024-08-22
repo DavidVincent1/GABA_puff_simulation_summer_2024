@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import os
 
 
+# INPUT
 # This script opens the pickle files and display the graphs
 #filepath = r"Path of the folder where the pickle files are"
 filepath = r"Path of the folder where the pickle files are"
