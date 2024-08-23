@@ -14,7 +14,7 @@ rcParams.update({'font.size': 22})
 # Experimental data --------------------------------------------------------------------------
 # INPUT 1
 # the data is a excel file
-path = "Données_expérimentales\Autres\lifetimes.xlsx"
+path = "Experimental_data\Autres\lifetimes.xlsx"
 indice = pd.read_excel(path, sheet_name=0)['ROI ID']
 data = pd.read_excel(path, sheet_name=1)
 data = np.asarray(data) # excel -> np.array

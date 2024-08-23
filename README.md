@@ -111,7 +111,7 @@ Output:
 
 ### kcc2_nkcc1_grid_analysis.py
 Inputs:
-1) The path of the folder where you want the pickle files to be saved.
+1) The path of the folder where you want the pickle files to be saved. A folder with the pickle files in it will be created.
 
 2) The dimension of the grid (two integers -> 'nb_kcc2' and 'nb_nkcc1')
 

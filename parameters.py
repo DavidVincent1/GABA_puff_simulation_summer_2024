@@ -5,12 +5,12 @@ from neuron.units import mV, µm, mM, ms
 # Temporal parameters -------------------------------------------------------------------------------------------------------
 time_for_stabilization = 500000 # Time for initial stabilization of the cell during simulation [ms]
 simulation_lenght = 520000      # Time for the whole simulation. Must be > time_for_stabilization [ms]
-dt1 = 0.144                     # dt1 for (0 to skip) : first stabilisation [ms]
+dt1 = 5                         # dt1 for (0 to skip) : first stabilisation [ms]
 dt2 = 0.144                     # dt2 for (skip to puff time) : just before the puff [ms]
-dt3 = 5                         # dt3 for (puff time to simulation lenght) : real integration during the GABA puff event [ms]
+dt3 = 0.144                     # dt3 for (puff time to simulation lenght) : real integration during the GABA puff event [ms]
 
 
-# GABA puff paramters ----------------------------------------------------------------------------------------------------------------------------
+# GABA puff parameters ----------------------------------------------------------------------------------------------------------------------------
 time_of_puff = time_for_stabilization + 100 # Time of the GABA puff event. Must be time_for_stabilization < time_of_puff < simulation lenght  [ms]
 position_of_puff = 40                       # Position of the GABA puff event [µm]
 concentration_of_puff = 1                   # Concentration of the GABA puff [mM]
@@ -18,7 +18,8 @@ Dgaba = 0.765                               # GABA diffusion coefficient [um2/ms
                                                 # Source :
                                                 # The structure and diffusion behaviour of the neurotransmitter  
                                                 # c-aminobutyric acid (GABA) in neutral aqueous solutions
-tau_GABA = 2500                             # GABA exchange with bath constant [ms]
+tau_GABA = 2100                             # GABA exchange with bath constant [ms]
+number_of_rec = 40                          # Number of recording vectors for concentrations
 
 
 # Synapses parameters ------------------------------------------------------------------------------------
@@ -116,7 +117,14 @@ dend_gkbar = 0.036*factor  # Maximum HH channels conductance for potassium in de
 dend2_gkbar = 0.036*factor # Maximum HH channels conductance for potassium in dendrite (second part) [S/cm2]
 
 
-# Other parameters ---------------------------------------------------
+# Other parameters ----------------------------------------------------------------
 axial_resistance = 100   # Axial resistance in all the cell [Ohm * cm]
 membrane_capacitance = 1 # Membrane capacitance [micro Farads/cm2]
 temperature = 23         # Temperature during the simulation [degC]
+
+intial_cli = 20      # Initial intracellular chloride concentration in cell [mM]
+initial_ki = 173.01  # Initial intracellular potassium concentration in cell [mM]
+initial_nai = 14.172 # Initial intracellular sodium concentration in cell [mM]
+clo = 130.5          # Extracellular chloride concentration [mM]
+ko = 3.5             # Extracellular potassium concentration [mM]
+nao = 147.25         # Extracellular sodium concentration [mM]

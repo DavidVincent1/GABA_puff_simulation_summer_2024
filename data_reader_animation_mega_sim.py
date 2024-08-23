@@ -14,7 +14,8 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-f = h5py.File(r"Path of the dataset file", 'r')
+path = r"Path of the dataset file"
+f = h5py.File(path, 'r')
 
 
 # To see the keys of the datatset

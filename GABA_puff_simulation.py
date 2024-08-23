@@ -1,3 +1,6 @@
+import time
+texp = time.time()
+
 from neuron import h
 from neuron.units import ms, mV, mM
 from matplotlib import rcParams
@@ -9,7 +12,7 @@ rcParams.update({'font.size': 22}) # Graph parameters
 
 
 # Loading mod files and for better simulation --------------------------
-h.nrn_load_dll(r"mod_files\nrnmech")
+h.nrn_load_dll(r"mod_files\nrnmech.dll")
 h.load_file("stdrun.hoc")
 
 
@@ -22,14 +25,14 @@ syn_nb = int(p.dend_lenght_with_synapses * p.syn_per_micron) # number of synapse
 synapse_pos = np.linspace(0.01, p.dend_lenght_with_synapses/p.dend_lenght, syn_nb) # position of synapses
 
 
-# Recording vectors positions for concentration (K+, Na+, Cl-) ----------
-record_pos1 = np.linspace(0.01, (p.position_of_puff*2)/p.dend_lenght, 40)
+# Recording vectors positions for concentration (K+, Na+, Cl-) -----------------------
+record_pos1 = np.linspace(0.01, (p.position_of_puff*2)/p.dend_lenght, p.number_of_rec)
 
 
 # Assure that there is a recording vector at the GABA puff position ----------------------------
 mini, mini_pos = record_pos1[0], 0
 for i,j in enumerate(record_pos1):
-    if abs(j-p.position_of_puff*2/p.dend_lenght) < abs(mini-p.position_of_puff*2/p.dend_lenght):
+    if abs(j-p.position_of_puff/p.dend_lenght) < abs(mini-p.position_of_puff/p.dend_lenght):
         mini = j
         mini_pos = i
 record_pos1[mini_pos] = p.position_of_puff/p.dend_lenght
@@ -40,22 +43,21 @@ puff_pos = p.position_of_puff/p.dend_lenght # position of the puff event on the 
 
 
 # Creation of the cell ----------------------------------
-if p.U_kcc2 == 5.5e-5 and p.U_nkcc1 == 5e-7:
-    mp = p.clamp_amp # 1500 ms pip, -90 mV
-    my_cell = NeuronCell(0,
-                        number_of_dendrite_segments=p.dend_nseg,
-                        number_of_soma_segments=p.soma_nseg,
-                        number_of_dendrite_segments2=p.dend2_nseg,
-                        dendrite_length_um=p.dend_lenght,
-                        dendrite_length_um2=p.dend2_lenght,
-                        cli_0=20,
-                        nai_0=14.172,
-                        ki_0=173.01,
-                        clo_0=130.5,
-                        nao_0=147.25,
-                        ko_0=3.5,
-                        ukcc2=p.U_kcc2,
-                        unkcc1=p.U_nkcc1)
+mp = p.clamp_amp # 1500 ms pip, -90 mV
+my_cell = NeuronCell(0,
+                    number_of_dendrite_segments=p.dend_nseg,
+                    number_of_soma_segments=p.soma_nseg,
+                    number_of_dendrite_segments2=p.dend2_nseg,
+                    dendrite_length_um=p.dend_lenght,
+                    dendrite_length_um2=p.dend2_lenght,
+                    cli_0=p.intial_cli,
+                    nai_0=p.initial_nai,
+                    ki_0=p.initial_ki,
+                    clo_0=p.clo,
+                    nao_0=p.nao,
+                    ko_0=p.ko,
+                    ukcc2=p.U_kcc2,
+                    unkcc1=p.U_nkcc1)
 
 
 # GABA puff event and simulation ------------------------------
@@ -76,6 +78,12 @@ GABA_puff_event = syna(my_cell,
                         skip=p.time_for_stabilization)
 
 
+tcomp = time.time() - texp
+print("Simulation done")
+print("Computational time [s] : ", tcomp)
+print("Computational time [min, s] : ", int(tcomp//60, tcomp)-(tcomp//60)*60)
+
+
 # Arrays for save function ---------------------------------------------------------------------------------------
 dataset_t_mp_soma, dataset_mp_dend = GABA_puff_event[0], GABA_puff_event[1]
 dataset_conc_dend, dataset_conc_soma = GABA_puff_event[2], GABA_puff_event[3]
@@ -89,10 +97,10 @@ dataset_g_and_o = GABA_puff_event[13]
 # path for dataset and name of the file--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 if p.clamp:
     name = f"voltclamped_{p.clamp_amp}mV_syn_nb_{len(synapse_pos)}_sim_lenght_{p.simulation_lenght}_dt_({p.dt1},{p.dt2},{p.dt3})_L_{p.dend_lenght}_kcc2_{p.U_kcc2}_nkcc1_{p.U_nkcc1}_rnum={p.rnum}_puffconc={p.concentration_of_puff}_{my_cell.dend.DCl_iondifus}.hdf5"
-    filepath_h5 = Path.cwd()/"Multiple_syn_2024_07-31"/"dataset"/name
+    filepath_h5 = Path.cwd()/"dataset"/name
 else:
     name = f"unclamped_{mp}mV_syn_nb_{len(synapse_pos)}_sim_lenght_{p.simulation_lenght}_dt_({p.dt1},{p.dt2},{p.dt3})_L_{p.dend_lenght}_kcc2_{p.U_kcc2}_nkcc1_{p.U_nkcc1}_rnum={p.rnum}_puffconc={p.concentration_of_puff}_{my_cell.dend.DCl_iondifus}.hdf5"
-    filepath_h5 = Path.cwd()/"Multiple_syn_2024_07-31"/"dataset"/name
+    filepath_h5 = Path.cwd()/"dataset"/name
 
 
 # Saving ----------------------------------------------

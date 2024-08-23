@@ -13,7 +13,8 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-f = h5py.File(r"Path of the dataset file", 'r')
+path = r"Path of the dataset file"
+f = h5py.File(path, 'r')
 
 
 # To see the keys of the datatset
@@ -1391,10 +1392,11 @@ if open_states_all == 1:
                 ax_[i,j].set_ylim(op.min(), op.max())
                 ax_[i,j].set_xlim(xlimit_min, xlimit_max)
                 ax_[i,j].tick_params(axis='both', labelsize=18)
+    
+    del op
 
 del o1
 del o2
 del o3
-del op
 
 plt.show()

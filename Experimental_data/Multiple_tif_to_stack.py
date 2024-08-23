@@ -18,4 +18,4 @@ stacked_data = np.stack(data)
 
 
 # Saving the stack ----------------------------
-tifffile.imwrite(path + 'C1.tif', stacked_data)
+tifffile.imwrite(path + '\C1.tif', stacked_data)

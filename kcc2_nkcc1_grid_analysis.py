@@ -22,21 +22,21 @@ h.load_file("stdrun.hoc")
 # INPUT 1
 # path where to save the pickle files. It makes it possible to edit the graphs later throught the
 # 'data_reader_pickle.py' file.
-filepath = r"pickle" 
+filepath = r"dataset" 
 
 
 # temperature in celsius -
 h.celsius = p.temperature
 
 
-# KCC2 and NKCC1 strenght lists -----------------------------------
+# KCC2 and NKCC1 strenght lists ------------------------------------------------------
 # INPUT 2
 nb_kcc2 = 1  # the 2D grid will be nb_kcc2 x nb_nkcc1
 nb_nkcc1 = 1 # ^
 
 # INPUT 3
-range_kcc2 = 1e-5, 1e-4
-range_nkcc1 = 1e-5, 1e-4
+range_kcc2 = 1e-5, 1e-4  # Range will begin at range_kcc2[0] and end at range_kcc2
+range_nkcc1 = 1e-5, 1e-4 # Range will begin at range_nkcc1[0] and end at range_nkcc1
 
 Ukcc2 = np.linspace(range_kcc2[1], range_kcc2[0], nb_kcc2)   # Range of U_KCC2 values
 Unkcc1 = np.linspace(range_nkcc1[0], range_nkcc1[1], nb_nkcc1) # Range of U_nkc1 values
@@ -63,7 +63,7 @@ record_pos1 = np.linspace(0.01, (p.position_of_puff*2)/p.dend_lenght, 40)
 # Assure that there is a recording vector at the GABA puff position
 mini, mini_pos = record_pos1[0], 0
 for i,j in enumerate(record_pos1):
-    if abs(j-p.position_of_puff*2/p.dend_lenght) < abs(mini-p.position_of_puff*2/p.dend_lenght):
+    if abs(j-p.position_of_puff/p.dend_lenght) < abs(mini-p.position_of_puff/p.dend_lenght):
         mini = j
         mini_pos = i
 record_pos1[mini_pos] = p.position_of_puff/p.dend_lenght
@@ -104,12 +104,12 @@ def run_simulation(i, j):
                             number_of_dendrite_segments2=p.dend2_nseg,
                             dendrite_length_um=p.dend_lenght,
                             dendrite_length_um2=p.dend2_lenght,
-                            cli_0=10,
-                            nai_0=13,
-                            ki_0=145,
-                            clo_0=130.5,
-                            nao_0=147.25,
-                            ko_0=3.5,
+                            cli_0=p.intial_cli,
+                            nai_0=p.initial_nai,
+                            ki_0=p.initial_ki,
+                            clo_0=p.clo,
+                            nao_0=p.nao,
+                            ko_0=p.ko,
                             ukcc2=Ukcc2[i],
                             unkcc1=Unkcc1[j])
 
@@ -122,12 +122,13 @@ def run_simulation(i, j):
                             puff_conc=p.concentration_of_puff,
                             tau=p.tau_GABA,
                             dgab=p.Dgaba,
-                            rnum=p.rnum,
+                            rnum=[p.rnum],
                             clamp=p.clamp,
                             clamp_amp=p.clamp_amp,
                             rmp_initial=MP,
                             sim_time=p.simulation_lenght,
                             record_pos=record_pos1,
+                            skip=p.time_for_stabilization,
                             pipette=p.pipett)
 
     # Tuple returned by the function
@@ -289,26 +290,24 @@ if __name__ == '__main__':
     plt.ylabel(r"$U_{kcc2}$ [mM/ms]")
 
     # To save the graphs as pickle files.
-    filepath1 = filepath + '\Sodium_steady_state.pickle'
-    filepath2 = filepath + '\Potassium_steady_state.pickle'
-    filepath3 = filepath + '\Chlore_steady_state.pickle'
-    filepath4 = filepath + '\Resting_mp.pickle'
-    filepath5 = filepath + '\Delta_chloride.pickle'
-    filepath6 = filepath + '\Stable_chloride.pickle'
-    filepath7 = filepath + '\Stable_potassium.pickle'
-    filepath8 = filepath + '\Stable_sodium.pickle'
-    filepath9 = filepath + '\Stable_mp.pickle'
-    filepath10 = filepath + '\Stable_ecl.pickle'
-    pickle.dump(fig1, open(filepath1, 'wb'))
-    pickle.dump(fig2, open(filepath2, 'wb'))
-    pickle.dump(fig3, open(filepath3, 'wb'))
-    pickle.dump(fig4, open(filepath4, 'wb'))
-    pickle.dump(fig5, open(filepath5, 'wb'))
-    pickle.dump(fig6, open(filepath6, 'wb'))
-    pickle.dump(fig7, open(filepath7, 'wb'))
-    pickle.dump(fig8, open(filepath8, 'wb'))
-    pickle.dump(fig9, open(filepath9, 'wb'))
-    pickle.dump(fig10, open(filepath10, 'wb'))
+    folder_path = filepath + f'\pickle_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}'
+    if not os.path.exists(folder_path):
+        os.mkdir(folder_path)
+    else:
+        input = input('The folder for the pickle files already exists. Proceed anyway ? Yes/No : ')
+        if input == 'No' or input == 'no' or input == 'Non' or input == 'non':
+            raise Exception('Manually stoped')
+
+    pickle.dump(fig1, open(folder_path + '\Sodium_steady_state.pickle', 'wb'))
+    pickle.dump(fig2, open(folder_path + '\Potassium_steady_state.pickle', 'wb'))
+    pickle.dump(fig3, open(folder_path + '\Chlore_steady_state.pickle', 'wb'))
+    pickle.dump(fig4, open(folder_path + '\Resting_mp.pickle', 'wb'))
+    pickle.dump(fig5, open(folder_path + '\Delta_chloride.pickle', 'wb'))
+    pickle.dump(fig6, open(folder_path + '\Stable_chloride.pickle', 'wb'))
+    pickle.dump(fig7, open(folder_path + '\Stable_potassium.pickle', 'wb'))
+    pickle.dump(fig8, open(folder_path + '\Stable_sodium.pickle', 'wb'))
+    pickle.dump(fig9, open(folder_path + '\Stable_mp.pickle', 'wb'))
+    pickle.dump(fig10, open(folder_path + '\Stable_ecl.pickle', 'wb'))
 
 
 plt.show()
