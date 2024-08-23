@@ -1,5 +1,6 @@
 *.o
 *.c
 *.tmp
-**/datasets
+**/dataset
 **/_pycache_
+**/animation
