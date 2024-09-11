@@ -7,12 +7,16 @@ rcParams.update({'font.size': 22}) # Graph parameters
 # Range of potential ----------------------
 # We want m, n, h = 0.5 at -40, -20, -20 mV 
 v = np.linspace(-100, 100, 10000)
+v2 = np.linspace(-160, 40, 10000)
 
 def expcc(x, y):
     return x/(np.exp(x/y)-1)
 
 def expcc2(x, y):
     return x/(1-np.exp(x/y))
+
+def expclc(x, y=-60, v1=15, v2=-14):
+    return 1/(1 + np.exp((y - x - v1)/v2))
 
 
 # From Neuronal Dynamics ---------------------
@@ -34,6 +38,10 @@ taun2 = 1/(alphan2 + betan2)
 n2 = alphan2*taun2
 
 
+# CLC-2 --------
+pinf = expclc(v2)
+
+
 # Graphs --------------------------------------------------------------
 fig, ax = plt.subplots(1, 2)
 fig.canvas.manager.set_window_title('HH_channels_parameters')
@@ -53,6 +61,12 @@ ax[1].set_xlabel("Potential [mV]")
 
 ax[0].legend()
 ax[1].legend()
+
+
+plt.figure("CLC-2 activation parameter")
+plt.plot(v2, pinf, color='black')
+plt.xlabel('Potential [mV]')
+plt.ylabel(r"$p_{\infty}$ [-]")
 
 
 plt.show()

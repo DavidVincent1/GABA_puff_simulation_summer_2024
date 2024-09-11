@@ -60,6 +60,7 @@ class NeuronCell:
         self.soma.insert("nkcc1")
         self.soma.insert("nakpump")
         self.soma.insert("leak")
+        self.soma.insert("clc2")
 
         self.dend.insert("hhrat")
         self.dend.insert("iondifus")
@@ -67,6 +68,7 @@ class NeuronCell:
         self.dend.insert("nkcc1")
         self.dend.insert("nakpump")
         self.dend.insert("leak")
+        self.dend.insert("clc2")
 
         self.dend2.insert("hhrat")
         self.dend2.insert("iondifus")
@@ -74,6 +76,7 @@ class NeuronCell:
         self.dend2.insert("nkcc1")
         self.dend2.insert("nakpump")
         self.dend2.insert("leak")
+        self.dend2.insert("clc2")
 
         # Chloride diffusion coefficient
         self.soma.DCl_iondifus = p.soma_DCl
@@ -152,6 +155,13 @@ class NeuronCell:
         self.dend.U_nkcc1 = self.nkcc1 * (self.soma.Vi_nkcc1 * self.dend.S_nkcc1)/(self.soma.S_nkcc1 * self.dend.Vi_nkcc1)
         self.dend2.U_nkcc1 = self.nkcc1 * (self.soma.Vi_nkcc1 * self.dend2.S_nkcc1)/(self.soma.S_nkcc1 * self.dend2.Vi_nkcc1)
 
+        # CLC-2 parameters
+        self.soma.gclc2_clc2 = p.soma_gclc2
+        self.dend.gclc2_clc2 = p.dend_gclc2
+        self.dend2.gclc2_clc2 = p.dend2_gclc2
+
+
+
         for sec1 in self.all:
             # General cell parameters
             sec1.Ra = p.axial_resistance
@@ -175,6 +185,11 @@ class NeuronCell:
             sec1.clo0_iondifus = self.clo_0
             sec1.nao0_iondifus = self.nao_0
             sec1.ko0_iondifus = self.ko_0
+
+            # CLC-2 parameters
+            sec1.vhalf_clc2 = p.vhalf
+            sec1.vslope_clc2 = p.vslope
+            sec1.ptau_clc2 = p.ptau
 
     def __repr__(self):
         return "BallAndStick[{}]".format(self._gid)

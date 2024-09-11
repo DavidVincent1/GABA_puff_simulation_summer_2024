@@ -87,7 +87,7 @@ dend_kmna = 10  # ? [mM]
 dend2_kmna = 10 # ? [mM]
 
 
-# hh_rat.mod parameters --------------------------------------------------------------
+# leak.mod parameters -----------------------------------------------------------------------
 soma_gk = 5e-5  # Potassium leak channels conductance in soma [S/cm2]
 dend_gk = 5e-5  # Potassium leak channels conductance in dendrite (first part) [S/cm2]
 dend2_gk = 5e-5 # Potassium leak channels conductance in dendrite (second part) [S/cm2]
@@ -115,6 +115,15 @@ dend2_gnabar = 0.12*factor # Maximum HH channels conductance for sodium in dendr
 soma_gkbar = 0.036*factor  # Maximum HH channels conductance for potassium in soma [S/cm2]
 dend_gkbar = 0.036*factor  # Maximum HH channels conductance for potassium in dendrite (first part) [S/cm2]
 dend2_gkbar = 0.036*factor # Maximum HH channels conductance for potassium in dendrite (second part) [S/cm2]
+
+
+# clc2.mod ----------------------------------------------------------------------------------
+soma_gclc2 = 1e-3  # Maximum conductance of CLC-2 channels in soma [S/cm2] 
+dend_gclc2 = 1e-3  # Maximum conductance of CLC-2 channels in dendrite (first part) [S/cm2] 
+dend2_gclc2 = 1e-3 # Maximum conductance of CLC-2 channels in dendrite (second part) [S/cm2]
+ptau = 300         # Parameter in the equation of the opened probabilities [ms] 
+vhalf = 15         # Parameter in the equation of the opened probabilities [mV]
+vslope = -14       # Parameter in the equation of the opened probabilities [mV]
 
 
 # Other parameters ----------------------------------------------------------------
