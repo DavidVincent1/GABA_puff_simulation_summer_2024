@@ -45,7 +45,7 @@ ASSIGNED {
 BREAKPOINT {
         SOLVE states METHOD cnexp
         gclc = gclc2*p
-        icl = gclc*(v - ena)
+        icl = gclc*(v - ecl)
 }
 
 

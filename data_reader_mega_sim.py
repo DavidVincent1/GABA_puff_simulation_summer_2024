@@ -13,7 +13,7 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-path = r"Path of the dataset file"
+path = r"dataset\voltclamped_-90mV_syn_nb_20_sim_lenght_520000_dt_(5,0.144,0.144)_L_150_kcc2_5.5e-05_nkcc1_5e-07_rnum=200_puffconc=1_2.0.hdf5"
 f = h5py.File(path, 'r')
 
 
@@ -28,7 +28,7 @@ graph_fr = False # If True, the graphs axis, titles and legends will be in frenc
 # Graphs choices. Put 1 if you want the graph and 0 if not. -------------------------------------------------------------------
 show_info = 0 # Print information on the simulation
 
-chloride = 0  # Chloride intracellular concentration with multiple curves corresponding to different recording positions
+chloride = 1  # Chloride intracellular concentration with multiple curves corresponding to different recording positions
 potassium = 0 # Potassium intracellular concentration with multiple curves corresponding to different recording positions
 sodium = 0    # Sodium intracellular concentration with multiple curves corresponding to different recording positions
 gab = 0       # GABA extracellular concentration with multiple curves corresponding to different recording positions
@@ -48,7 +48,7 @@ isynapse = 0                # Total current caused by each of the 16 first synap
 
 gcl_ghco3_grel = 0   # Chloride and HCO3- conductance at each of the 16 first synapses
 open_states = 0      # Number of open channels at each synapses in the 3 states and combined
-open_states_all = 1  # Number of open channels at each of the 16 first synapses
+open_states_all = 0  # Number of open channels at each of the 16 first synapses
 
 
 # Separation of the dataset in arrays ----------------------------------------------------
@@ -395,7 +395,7 @@ if sodium == 1:
     if graph_fr:
         ax4[1].set_title(f"Vers l'opposé du soma (de {record_pos_end[0]*lenght:.1f} à {record_pos_end[-1]*lenght:.1f} µm dans la dendrite)")
     else:
-        ax4[1].set_title(f"Potassium concentration from {record_pos_end[0]*lenght:.1f} to {record_pos_end[-1]*lenght:.1f} µm")
+        ax4[1].set_title(f"Sodium concentration from {record_pos_end[0]*lenght:.1f} to {record_pos_end[-1]*lenght:.1f} µm")
 
     for i, val in enumerate(dend_nai_end):
         if i == 0:

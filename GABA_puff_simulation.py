@@ -81,7 +81,7 @@ GABA_puff_event = syna(my_cell,
 tcomp = time.time() - texp
 print("Simulation done")
 print("Computational time [s] : ", tcomp)
-print("Computational time [min, s] : ", int(tcomp//60, tcomp)-(tcomp//60)*60)
+print("Computational time [min, s] : ", int(tcomp//60), tcomp-(tcomp//60)*60)
 
 
 # Arrays for save function ---------------------------------------------------------------------------------------

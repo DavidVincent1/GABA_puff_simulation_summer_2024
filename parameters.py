@@ -30,7 +30,7 @@ rnum = 200                     # Number of GABA_A neuroreceptors per synapse
 
 # Voltage clamp parameters ----------------------------------------------------------------------------------------------
 clamp = True                            # True : the soma is voltage clamped and False : the soma is not voltage clamped.
-clamp_amp = -90                         # Amplitude of the clamp [mV]
+clamp_amp = -40                         # Amplitude of the clamp [mV]
 pipett = (1500*ms, 8*mM, 140*mM, 12*mM) # Pipette parameters (if the soma is voltage clamped)
                                             # pipett[0] : Exchange constant with the pipette
                                             # pipett[1] : Chloride concentration in the pipette
@@ -57,8 +57,8 @@ dend2_nseg = 21    # Number of segments in dendrite (second part) [-]
 # entered in each of these sections is ajusted so that the maximum current density created by
 # the mecanisms is uniform on the cell. The parameters here are the value for the soma.
 
-U_kcc2 = 5.5e-5 # Maximum KCC2 pump strength [mM/ms]
-U_nkcc1 = 5e-7  # Maximum NKCC1 pump strength [mM/ms]
+U_kcc2 = 3e-5 # Maximum KCC2 pump strength [mM/ms]
+U_nkcc1 = 1e-6  # Maximum NKCC1 pump strength [mM/ms]
 
 V = soma_lenght*math.pi*(soma_diam/2)**2                             # Volume of soma [um3]
 S = 2*math.pi*(soma_diam/2)*soma_lenght + 2*math.pi*(soma_diam/2)**2 # Surface of soma [um2]
@@ -118,9 +118,9 @@ dend2_gkbar = 0.036*factor # Maximum HH channels conductance for potassium in de
 
 
 # clc2.mod ----------------------------------------------------------------------------------
-soma_gclc2 = 1e-3  # Maximum conductance of CLC-2 channels in soma [S/cm2] 
-dend_gclc2 = 1e-3  # Maximum conductance of CLC-2 channels in dendrite (first part) [S/cm2] 
-dend2_gclc2 = 1e-3 # Maximum conductance of CLC-2 channels in dendrite (second part) [S/cm2]
+soma_gclc2 = 1e-4  # Maximum conductance of CLC-2 channels in soma [S/cm2] 
+dend_gclc2 = 1e-4  # Maximum conductance of CLC-2 channels in dendrite (first part) [S/cm2] 
+dend2_gclc2 = 1e-4 # Maximum conductance of CLC-2 channels in dendrite (second part) [S/cm2]
 ptau = 300         # Parameter in the equation of the opened probabilities [ms] 
 vhalf = 15         # Parameter in the equation of the opened probabilities [mV]
 vslope = -14       # Parameter in the equation of the opened probabilities [mV]
