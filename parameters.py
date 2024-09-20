@@ -3,17 +3,17 @@ from neuron.units import mV, µm, mM, ms
 
 
 # Temporal parameters -------------------------------------------------------------------------------------------------------
-time_for_stabilization = 500000 # Time for initial stabilization of the cell during simulation [ms]
-simulation_lenght = 520000      # Time for the whole simulation. Must be > time_for_stabilization [ms]
+time_for_stabilization = 600000 # Time for initial stabilization of the cell during simulation [ms]
+simulation_lenght = 610000      # Time for the whole simulation. Must be > time_for_stabilization [ms]
 dt1 = 5                         # dt1 for (0 to skip) : first stabilisation [ms]
-dt2 = 0.144                     # dt2 for (skip to puff time) : just before the puff [ms]
-dt3 = 0.144                     # dt3 for (puff time to simulation lenght) : real integration during the GABA puff event [ms]
+dt2 = 5#0.144                     # dt2 for (skip to puff time) : just before the puff [ms]
+dt3 = 5#0.144                     # dt3 for (puff time to simulation lenght) : real integration during the GABA puff event [ms]
 
 
 # GABA puff parameters ----------------------------------------------------------------------------------------------------------------------------
 time_of_puff = time_for_stabilization + 100 # Time of the GABA puff event. Must be time_for_stabilization < time_of_puff < simulation lenght  [ms]
 position_of_puff = 40                       # Position of the GABA puff event [µm]
-concentration_of_puff = 1                   # Concentration of the GABA puff [mM]
+concentration_of_puff = 0                   # Concentration of the GABA puff [mM]
 Dgaba = 0.765                               # GABA diffusion coefficient [um2/ms]
                                                 # Source :
                                                 # The structure and diffusion behaviour of the neurotransmitter  
@@ -30,7 +30,7 @@ rnum = 200                     # Number of GABA_A neuroreceptors per synapse
 
 # Voltage clamp parameters ----------------------------------------------------------------------------------------------
 clamp = True                            # True : the soma is voltage clamped and False : the soma is not voltage clamped.
-clamp_amp = -40                         # Amplitude of the clamp [mV]
+clamp_amp = -90                         # Amplitude of the clamp [mV]
 pipett = (1500*ms, 8*mM, 140*mM, 12*mM) # Pipette parameters (if the soma is voltage clamped)
                                             # pipett[0] : Exchange constant with the pipette
                                             # pipett[1] : Chloride concentration in the pipette
@@ -57,8 +57,8 @@ dend2_nseg = 21    # Number of segments in dendrite (second part) [-]
 # entered in each of these sections is ajusted so that the maximum current density created by
 # the mecanisms is uniform on the cell. The parameters here are the value for the soma.
 
-U_kcc2 = 3e-5 # Maximum KCC2 pump strength [mM/ms]
-U_nkcc1 = 1e-6  # Maximum NKCC1 pump strength [mM/ms]
+U_kcc2 = 1e-6   # Maximum KCC2 pump strength [mM/ms]
+U_nkcc1 = 1.5e-4  # Maximum NKCC1 pump strength [mM/ms]
 
 V = soma_lenght*math.pi*(soma_diam/2)**2                             # Volume of soma [um3]
 S = 2*math.pi*(soma_diam/2)*soma_lenght + 2*math.pi*(soma_diam/2)**2 # Surface of soma [um2]
@@ -118,9 +118,9 @@ dend2_gkbar = 0.036*factor # Maximum HH channels conductance for potassium in de
 
 
 # clc2.mod ----------------------------------------------------------------------------------
-soma_gclc2 = 1e-4  # Maximum conductance of CLC-2 channels in soma [S/cm2] 
-dend_gclc2 = 1e-4  # Maximum conductance of CLC-2 channels in dendrite (first part) [S/cm2] 
-dend2_gclc2 = 1e-4 # Maximum conductance of CLC-2 channels in dendrite (second part) [S/cm2]
+soma_gclc2 = 5e-6  # Maximum conductance of CLC-2 channels in soma [S/cm2] 
+dend_gclc2 = 5e-6  # Maximum conductance of CLC-2 channels in dendrite (first part) [S/cm2] 
+dend2_gclc2 = 5e-6 # Maximum conductance of CLC-2 channels in dendrite (second part) [S/cm2]
 ptau = 300         # Parameter in the equation of the opened probabilities [ms] 
 vhalf = 15         # Parameter in the equation of the opened probabilities [mV]
 vslope = -14       # Parameter in the equation of the opened probabilities [mV]

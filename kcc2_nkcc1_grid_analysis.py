@@ -35,8 +35,8 @@ nb_kcc2 = 5  # the 2D grid will be nb_kcc2 x nb_nkcc1
 nb_nkcc1 = 5 # ^
 
 # INPUT 3
-range_kcc2 = 1e-5, 1e-3  # Range will begin at range_kcc2[0] and end at range_kcc2
-range_nkcc1 = 1e-5, 1e-3 # Range will begin at range_nkcc1[0] and end at range_nkcc1
+range_kcc2 = 1e-6, 5e-4  # Range will begin at range_kcc2[0] and end at range_kcc2
+range_nkcc1 = 1e-6, 5e-4 # Range will begin at range_nkcc1[0] and end at range_nkcc1
 
 Ukcc2 = np.linspace(range_kcc2[1], range_kcc2[0], nb_kcc2)   # Range of U_KCC2 values
 Unkcc1 = np.linspace(range_nkcc1[0], range_nkcc1[1], nb_nkcc1) # Range of U_nkc1 values
@@ -290,7 +290,7 @@ if __name__ == '__main__':
     plt.ylabel(r"$U_{kcc2}$ [mM/ms]")
 
     # To save the graphs as pickle files.
-    folder_path = filepath + f'\pickle_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}'
+    folder_path = filepath + f'\pickle_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}_gclc2={p.soma_gclc2}'
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
     else:

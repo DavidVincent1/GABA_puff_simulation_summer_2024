@@ -96,7 +96,7 @@ dataset_g_and_o = GABA_puff_event[13]
 
 # path for dataset and name of the file--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 if p.clamp:
-    name = f"voltclamped_{p.clamp_amp}mV_syn_nb_{len(synapse_pos)}_sim_lenght_{p.simulation_lenght}_dt_({p.dt1},{p.dt2},{p.dt3})_L_{p.dend_lenght}_kcc2_{p.U_kcc2}_nkcc1_{p.U_nkcc1}_rnum={p.rnum}_puffconc={p.concentration_of_puff}_{my_cell.dend.DCl_iondifus}.hdf5"
+    name = f"voltclamped_{p.clamp_amp}mV_syn_nb_{len(synapse_pos)}_sim_lenght_{p.simulation_lenght}_dt_({p.dt1},{p.dt2},{p.dt3})_L_{p.dend_lenght}_kcc2_{p.U_kcc2}_nkcc1_{p.U_nkcc1}_rnum={p.rnum}_puffconc={p.concentration_of_puff}_{my_cell.dend.DCl_iondifus}_gclc2=_{p.soma_gclc2}.hdf5"
     filepath_h5 = Path.cwd()/"dataset"/name
 else:
     name = f"unclamped_{mp}mV_syn_nb_{len(synapse_pos)}_sim_lenght_{p.simulation_lenght}_dt_({p.dt1},{p.dt2},{p.dt3})_L_{p.dend_lenght}_kcc2_{p.U_kcc2}_nkcc1_{p.U_nkcc1}_rnum={p.rnum}_puffconc={p.concentration_of_puff}_{my_cell.dend.DCl_iondifus}.hdf5"

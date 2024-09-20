@@ -13,7 +13,7 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-path = r"dataset\voltclamped_-90mV_syn_nb_20_sim_lenght_520000_dt_(5,0.144,0.144)_L_150_kcc2_5.5e-05_nkcc1_5e-07_rnum=200_puffconc=1_2.0.hdf5"
+path = r"dataset\voltclamped_-90mV_syn_nb_20_sim_lenght_510000_dt_(5,0.144,0.144)_L_150_kcc2_1e-06_nkcc1_0.00015_rnum=200_puffconc=1_2.0_gclc2=_1e-05.hdf5"
 f = h5py.File(path, 'r')
 
 
@@ -21,7 +21,7 @@ f = h5py.File(path, 'r')
 #print(list(f.keys()))
 
 
-decal = 490000   # Offset to skip the initial stabilization of the simulation
+decal = 480000   # Offset to skip the initial stabilization of the simulation
 graph_fr = False # If True, the graphs axis, titles and legends will be in french
 
 
@@ -197,6 +197,8 @@ if chloride == 1:
     arg_min_cl = np.argmin(dend_cli[:, int(decal/5):])
     max_cl = max([np.max(dend_cli[:, int(decal/5):]), np.max(soma_cli[int(decal/5):])])
     min_cl = min([np.min(dend_cli[:, int(decal/5):]), np.min(soma_cli[int(decal/5):])])
+    max_cl = 24
+    min_cl = 15
 
     fig1, ax1 = plt.subplots(2,1)
     fig1.canvas.manager.set_window_title('[cl]')
@@ -265,10 +267,10 @@ if chloride == 1:
         ax1[1].legend(loc='upper right')
     
     # If you want to manually choose the location of the legend
-    manual = False
+    manual = True
     if manual:
-        ax1[0].legend(loc='lower right')
-        ax1[1].legend(loc='upper right')
+        ax1[0].legend(loc='lower left')
+        ax1[1].legend(loc='lower left')
 
 del dend_cli_begin
 del dend_cli_end
