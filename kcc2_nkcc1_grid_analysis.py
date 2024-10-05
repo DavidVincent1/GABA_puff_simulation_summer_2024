@@ -290,7 +290,10 @@ if __name__ == '__main__':
     plt.ylabel(r"$U_{kcc2}$ [mM/ms]")
 
     # To save the graphs as pickle files.
-    folder_path = filepath + f'\pickle_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}_gclc2={p.soma_gclc2}'
+    if p.clamp:
+        folder_path = filepath + f'\pickle_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}_gclc2={p.soma_gclc2}_clamp={p.clamp_amp}'
+    else:
+        folder_path = filepath + f'\pickle_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}_gclc2={p.soma_gclc2}_unclamp_gnaother={p.dend_gnaother}'
     if not os.path.exists(folder_path):
         os.mkdir(folder_path)
     else:

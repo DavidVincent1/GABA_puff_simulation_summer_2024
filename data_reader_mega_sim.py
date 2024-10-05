@@ -13,7 +13,7 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-path = r"dataset\voltclamped_-90mV_syn_nb_20_sim_lenght_510000_dt_(5,0.144,0.144)_L_150_kcc2_1e-06_nkcc1_0.00015_rnum=200_puffconc=1_2.0_gclc2=_1e-05.hdf5"
+path = r"dataset\unclamped_-90mV_syn_nb_20_sim_lenght_800200_dt_(5,5,5)_L_150_kcc2_1e-06_nkcc1_0.00015_rnum=200_puffconc=0_2.0.hdf5"
 f = h5py.File(path, 'r')
 
 
@@ -21,14 +21,14 @@ f = h5py.File(path, 'r')
 #print(list(f.keys()))
 
 
-decal = 480000   # Offset to skip the initial stabilization of the simulation
+decal = 700000#480000   # Offset to skip the initial stabilization of the simulation
 graph_fr = False # If True, the graphs axis, titles and legends will be in french
 
 
 # Graphs choices. Put 1 if you want the graph and 0 if not. -------------------------------------------------------------------
-show_info = 0 # Print information on the simulation
+show_info = 1 # Print information on the simulation
 
-chloride = 1  # Chloride intracellular concentration with multiple curves corresponding to different recording positions
+chloride = 0  # Chloride intracellular concentration with multiple curves corresponding to different recording positions
 potassium = 0 # Potassium intracellular concentration with multiple curves corresponding to different recording positions
 sodium = 0    # Sodium intracellular concentration with multiple curves corresponding to different recording positions
 gab = 0       # GABA extracellular concentration with multiple curves corresponding to different recording positions
@@ -38,8 +38,8 @@ current_soma = 0     # All currents in soma and at one point in dendrite
 rev_pot_soma = 0     # Reversal potentials in soma and at one point in dendrite
 rev_pot_dend_all = 0 # Reversal potentials at each of the 16 first synapses
 
-icl_dend_all = 0            # Chloride currents at each of the 16 first synapses in dendrite
-icl_dend_soma_add_check = 0 # Chloride currents in the soma and at one point in the dendrite
+icl_dend_all = 1            # Chloride currents at each of the 16 first synapses in dendrite
+icl_dend_soma_add_check = 1 # Chloride currents in the soma and at one point in the dendrite
 ik_dend_all = 0             # Potassium currents at each of the 16 first synapses in dendrite
 ik_dend_soma_add_check = 0  # Potassium currents in the soma and at one point in the dendrite
 ina_dend_all = 0            # Sodium currents at each of the 16 first synapses in dendrite
@@ -112,8 +112,8 @@ dend_cli, dend_ki, dend_nai, dend_gabo = dend_conc[0], dend_conc[1], dend_conc[2
 soma_cli, soma_ki, soma_nai, soma_gabo = soma_conc[0], soma_conc[1], soma_conc[2], soma_conc[3]
 
 # Chloride currents arrays in dendrite and in soma
-dend_icl, dend_icl_kcc2, dend_icl_nkcc1, dend_icl_leak, dend_icl_synapses = dend_current_cl[0], dend_current_cl[1], dend_current_cl[2], dend_current_cl[3], dend_current_cl[4]
-soma_icl, soma_icl_kcc2, soma_icl_nkcc1, soma_icl_leak = soma_current_cl[0], soma_current_cl[1], soma_current_cl[2], soma_current_cl[3]
+dend_icl, dend_icl_kcc2, dend_icl_nkcc1, dend_icl_leak, dend_icl_synapses, dend_icl_clc2 = dend_current_cl[0], dend_current_cl[1], dend_current_cl[2], dend_current_cl[3], dend_current_cl[4], dend_current_cl[5]
+soma_icl, soma_icl_kcc2, soma_icl_nkcc1, soma_icl_leak, soma_icl_clc2 = soma_current_cl[0], soma_current_cl[1], soma_current_cl[2], soma_current_cl[3], soma_current_cl[4]
 
 # Potassium currents arrays in dendrite and in soma
 dend_ik, dend_ik_kcc2, dend_ik_nkcc1, dend_ik_leak, dend_ik_nak, dend_ik_hh = dend_current_k[0], dend_current_k[1], dend_current_k[2], dend_current_k[3], dend_current_k[4], dend_current_k[5]
@@ -777,10 +777,14 @@ del soma_ena
 
 
 if icl_dend_all == 1:
-    max_icl_big_currents = max([np.max(dend_icl), np.max(dend_icl_synapses), max(soma_icl)])
-    min_icl_big_currents = min([np.min(dend_icl), np.min(dend_icl_synapses), min(soma_icl)])
-    max_icl_smaller_currents = max([np.max(dend_icl_kcc2), np.max(dend_icl_nkcc1), np.max(dend_icl_leak)])
-    min_icl_smaller_currents = min([np.min(dend_icl_kcc2), np.min(dend_icl_nkcc1), np.min(dend_icl_leak)])
+    max_icl_big_currents = max([np.max(dend_icl[:,int(decal/5):]), np.max(dend_icl_synapses[:, int(decal/5):]),
+                                np.max(dend_icl_clc2[:, int(decal/5):]), max(soma_icl[int(decal/5):])])
+    min_icl_big_currents = min([np.min(dend_icl[:, int(decal/5):]), np.min(dend_icl_synapses[:, int(decal/5):]),
+                                np.min(dend_icl_clc2[:, int(decal/5):]), min(soma_icl[int(decal/5):])])
+    max_icl_smaller_currents = max([np.max(dend_icl_kcc2[:, int(decal/5):]), np.max(dend_icl_nkcc1[:, int(decal/5):]),
+                                    np.max(dend_icl_clc2[:, int(decal/5):]), np.max(dend_icl_leak[:, int(decal/5):])])
+    min_icl_smaller_currents = min([np.min(dend_icl_kcc2[:, int(decal/5):]), np.min(dend_icl_nkcc1[:, int(decal/5):]),
+                                    np.min(dend_icl_clc2[:, int(decal/5):]), np.min(dend_icl_leak[:, int(decal/5):])])
 
     fig_, ax_ = plt.subplots(4, 4)
     fig_.canvas.manager.set_window_title('I_cl at synapses (bigger currents)')
@@ -846,6 +850,11 @@ if icl_dend_all == 1:
         ax_[2, j].plot(t, dend_icl_leak[j+8], color='orange', alpha=0.7)
         ax_[3, j].plot(t, dend_icl_leak[j+12], color='orange', alpha=0.7)
 
+        ax_[0, j].plot(t, dend_icl_clc2[j], color='orange', linestyle=':', alpha=0.7)
+        ax_[1, j].plot(t, dend_icl_clc2[j+4], color='orange', linestyle=':', alpha=0.7)
+        ax_[2, j].plot(t, dend_icl_clc2[j+8], color='orange', linestyle=':', alpha=0.7)
+        ax_[3, j].plot(t, dend_icl_clc2[j+12], color='orange', linestyle=':', alpha=0.7)
+
     if graph_fr:
         for i in range(4):
             ax_[i, 0].set_ylabel('Current\n[pA]')
@@ -867,12 +876,26 @@ if icl_dend_all == 1:
     a = np.zeros_like(dend_icl_synapses[0])
     plt.figure('I_cl at synapses (smaller currents) label')
     plt.plot(t, a, color='orange', label=r'$I_{cl,leak}$')
+    plt.plot(t, a, color='orange', linestyle=':', label=r'$I_{cl,clc2}$')
     plt.plot(t, a, color='deepskyblue', label=r'$I_{cl,nkcc1}$')
     plt.plot(t, a, color='darkgreen', label=r'$I_{cl,kcc2}$')
     plt.ylim(1,2)
     plt.legend(loc='center')
 
 if icl_dend_soma_add_check == 1:
+    max_icl_dend = max([max(dend_icl[center_ind][int(decal/5):]), max(dend_icl_synapses[center_ind][int(decal/5):]),
+                        max(dend_icl_clc2[center_ind][int(decal/5):]), max(dend_icl_kcc2[center_ind][int(decal/5):]),
+                        max(dend_icl_nkcc1[center_ind][int(decal/5):]), max(dend_icl_leak[center_ind][int(decal/5):])])
+    min_icl_dend = min([min(dend_icl[center_ind][int(decal/5):]), min(dend_icl_synapses[center_ind][int(decal/5):]),
+                        min(dend_icl_clc2[center_ind][int(decal/5):]), min(dend_icl_kcc2[center_ind][int(decal/5):]),
+                        min(dend_icl_nkcc1[center_ind][int(decal/5):]), min(dend_icl_leak[center_ind][int(decal/5):])])
+    max_icl_soma = max([max(soma_icl[int(decal/5):]),
+                        max(soma_icl_clc2[int(decal/5):]), max(soma_icl_kcc2[int(decal/5):]),
+                        max(soma_icl_nkcc1[int(decal/5):]), max(soma_icl_leak[int(decal/5):])])
+    min_icl_soma = min([min(soma_icl[int(decal/5):]),
+                        min(soma_icl_clc2[int(decal/5):]), min(soma_icl_kcc2[int(decal/5):]),
+                        min(soma_icl_nkcc1[int(decal/5):]), min(soma_icl_leak[int(decal/5):])])
+
     plt.figure(f'Chloride_currents_dend')
     if graph_fr:
         plt.xlabel('Temps [s]')
@@ -886,11 +909,13 @@ if icl_dend_soma_add_check == 1:
     plt.plot(t, dend_icl_kcc2[center_ind], label=r'$I_{cl,kcc2}$', color="mediumblue", lw=2)
     plt.plot(t, dend_icl_nkcc1[center_ind], label=r'$I_{cl,nkcc1}$', color="darkkhaki", lw=2)
     plt.plot(t, dend_icl_leak[center_ind], label=r'$I_{cl,leak}$', color="darkorchid", lw=2, alpha=1)
+    plt.plot(t, dend_icl_clc2[center_ind], label=r'$I_{cl,clc2}$', color="darkorchid", linestyle=':', lw=2, alpha=1)
     plt.plot(t, dend_icl_synapses[center_ind], label=r'$I_{cl,synapses}$', color="deepskyblue", lw=2, alpha=1)
-    plt.plot(t, dend_icl_leak[center_ind] + dend_icl_synapses[center_ind] + dend_icl_nkcc1[center_ind] + dend_icl_kcc2[center_ind],
-            label=r'$I_{cl,kcc2}+I_{cl,nkcc1}+$' + '\n' + r'$I_{cl,leak}+I_{cl,synapse}$', color="black",
+    plt.plot(t, dend_icl_leak[center_ind] + dend_icl_synapses[center_ind] + dend_icl_nkcc1[center_ind] + dend_icl_kcc2[center_ind]+dend_icl_clc2[center_ind],
+            label=r'$I_{cl,kcc2}+I_{cl,nkcc1}+$' + '\n' + r'$I_{cl,leak}+I_{cl,synapse}+I_{cl,clc2}$', color="black",
             linestyle='--', alpha=0.3, lw=1.5)
     plt.xlim(xlimit_min, xlimit_max)
+    plt.ylim(min_icl_dend, max_icl_dend)
     plt.legend(loc='upper right')
 
 
@@ -907,9 +932,10 @@ if icl_dend_soma_add_check == 1:
     plt.plot(t, dend_icl_kcc2[center_ind], label=r'$I_{cl,kcc2}$', color="mediumblue", lw=2)
     plt.plot(t, dend_icl_nkcc1[center_ind], label=r'$I_{cl,nkcc1}$', color="darkkhaki", lw=2)
     plt.plot(t, dend_icl_leak[center_ind], label=r'$I_{cl,leak}$', color="darkorchid", lw=2, alpha=1)
+    plt.plot(t, dend_icl_clc2[center_ind], label=r'$I_{cl,clc2}$', color="darkorchid", linestyle=':', lw=2, alpha=1)
     plt.plot(t, dend_icl_synapses[center_ind], label=r'$I_{cl,synapses}$', color="deepskyblue", lw=2, alpha=1)
-    plt.plot(t, dend_icl_leak[center_ind] + dend_icl_synapses[center_ind] + dend_icl_nkcc1[center_ind] + dend_icl_kcc2[center_ind],
-            label=r'$I_{cl,kcc2}+I_{cl,nkcc1}+$' + '\n' + r'$I_{cl,leak}+I_{cl,synapse}$', color="black",
+    plt.plot(t, dend_icl_leak[center_ind] + dend_icl_synapses[center_ind] + dend_icl_nkcc1[center_ind] + dend_icl_kcc2[center_ind]+dend_icl_clc2[center_ind],
+            label=r'$I_{cl,kcc2}+I_{cl,nkcc1}+$' + '\n' + r'$I_{cl,leak}+I_{cl,synapse}+I_{cl,clc2}$', color="black",
             linestyle='--', alpha=0.3, lw=1.5)
     plt.xlim(0, 8)
     plt.ylim(-0.02, 0.2)
@@ -929,9 +955,11 @@ if icl_dend_soma_add_check == 1:
     plt.plot(t, soma_icl_kcc2, label=r'$I_{cl,kcc2}$', color="mediumblue", lw=2)
     plt.plot(t, soma_icl_nkcc1, label=r'$I_{cl,nkcc1}$', color="darkkhaki", lw=2)
     plt.plot(t, soma_icl_leak, label=r'$I_{cl,leak}$', color="darkorchid", lw=2, alpha=1)
-    plt.plot(t, soma_icl_leak + soma_icl_nkcc1 + soma_icl_kcc2,
-            label=r'$I_{cl,kcc2}+I_{cl,nkcc1}+I_{cl,leak}$', color="black", linestyle='--', alpha=0.3, lw=1.5)
+    plt.plot(t, soma_icl_clc2, label=r'$I_{cl,clc2}$', color="darkorchid", linestyle=':', lw=2, alpha=1)
+    plt.plot(t, soma_icl_leak + soma_icl_nkcc1 + soma_icl_kcc2 + soma_icl_clc2,
+            label=r'$I_{cl,kcc2}+I_{cl,nkcc1}+I_{cl,leak}+I_{cl,clc2}$', color="black", linestyle='--', alpha=0.3, lw=1.5)
     plt.xlim(xlimit_min, xlimit_max)
+    plt.ylim(min_icl_soma, max_icl_soma)
     plt.legend(loc='upper right')
 
 

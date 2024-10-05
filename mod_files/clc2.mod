@@ -14,7 +14,7 @@ UNITS {
 NEURON {
         SUFFIX clc2
         USEION cl READ ecl WRITE icl
-        RANGE gclc2, vhalf, vslope, ptau
+        RANGE gclc2, vhalf, vslope, ptau, icl
         : `GLOBAL minf` will be replaced with `RANGE minf` if CoreNEURON enabled
         GLOBAL pinf
         THREADSAFE : assigned GLOBALs will be per thread

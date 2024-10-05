@@ -326,8 +326,8 @@ def syna(cell, puff_pos, puff_time, puff_conc, pos, tau, dgab, rnum, clamp=False
     soma_ki = h.Vector().record(cell.soma(0.5)._ref_ki)
     soma_gab = h.Vector().record(cell.soma(0.5)._ref_gabo)
 
-    # Recording verctors for currents, reversal potentials, MP, conductance, open states in dend -------
-    dend_icl, dend_icl_kcc2, dend_icl_nkcc1, dend_icl_leak, dend_icl_gag = [], [], [], [], []
+    # Recording verctors for currents, reversal potentials, MP, conductance, open states in dend ---------------
+    dend_icl, dend_icl_kcc2, dend_icl_nkcc1, dend_icl_leak, dend_icl_gag, dend_icl_clc2 = [], [], [], [], [], []
     dend_ik, dend_ik_kcc2, dend_ik_nkcc1, dend_ik_leak, dend_ik_nak, dend_ik_hh = [], [], [], [], [], []
     dend_ina, dend_ina_nkcc1, dend_ina_leak, dend_ina_nak, dend_ina_hh = [], [], [], [], []
     dend_ihco3, dend_igaba = [], []
@@ -342,6 +342,7 @@ def syna(cell, puff_pos, puff_time, puff_conc, pos, tau, dgab, rnum, clamp=False
         dend_icl_kcc2.append(h.Vector().record(cell.dend(position[k])._ref_icl_kcc2))
         dend_icl_nkcc1.append(h.Vector().record(cell.dend(position[k])._ref_icl_nkcc1))
         dend_icl_leak.append(h.Vector().record(cell.dend(position[k])._ref_icl_leak))
+        dend_icl_clc2.append(h.Vector().record(cell.dend(position[k])._ref_icl_clc2))
         dend_icl_gag.append(h.Vector().record(gaba_R[k]._ref_icl))
 
         # Potassium currents, dend
@@ -388,6 +389,7 @@ def syna(cell, puff_pos, puff_time, puff_conc, pos, tau, dgab, rnum, clamp=False
     soma_icl_kcc2 = h.Vector().record(cell.soma(0.5)._ref_icl_kcc2)
     soma_icl_nkcc1 = h.Vector().record(cell.soma(0.5)._ref_icl_nkcc1)
     soma_icl_leak = h.Vector().record(cell.soma(0.5)._ref_icl_leak)
+    soma_icl_clc2 = h.Vector().record(cell.soma(0.5)._ref_icl_clc2)
 
     # Potassium currents, soma ------------------------------------
     soma_ik = h.Vector().record(cell.soma(0.5)._ref_ik)
@@ -448,6 +450,7 @@ def syna(cell, puff_pos, puff_time, puff_conc, pos, tau, dgab, rnum, clamp=False
         dend_icl_kcc2[l] *= dend_surface_area[l] * (1e9)
         dend_icl_nkcc1[l] *= dend_surface_area[l] * (1e9)
         dend_icl_leak[l] *= dend_surface_area[l] * (1e9)
+        dend_icl_clc2[l] *= dend_surface_area[l] * (1e9)
 
         dend_ik[l] *= dend_surface_area[l] * (1e9)
         dend_ik_kcc2[l] *= dend_surface_area[l] * (1e9)
@@ -471,6 +474,7 @@ def syna(cell, puff_pos, puff_time, puff_conc, pos, tau, dgab, rnum, clamp=False
     soma_icl_kcc2 *= soma_surface_area * (1e9)
     soma_icl_nkcc1 *= soma_surface_area * (1e9)
     soma_icl_leak *= soma_surface_area * (1e9)
+    soma_icl_clc2 *= soma_surface_area * (1e9)
 
     soma_ik *= soma_surface_area * (1e9)
     soma_ik_kcc2 *= soma_surface_area * (1e9)
@@ -493,10 +497,10 @@ def syna(cell, puff_pos, puff_time, puff_conc, pos, tau, dgab, rnum, clamp=False
     result_con_soma = (soma_cli, soma_ki, soma_nai, soma_gab)
     result_e_soma = (soma_ecl, soma_ek, soma_ena)
     result_e_dend = (dend_ecl, dend_ek, dend_ena)
-    result_icl_dend = (dend_icl, dend_icl_kcc2, dend_icl_nkcc1, dend_icl_leak, dend_icl_gag)
+    result_icl_dend = (dend_icl, dend_icl_kcc2, dend_icl_nkcc1, dend_icl_leak, dend_icl_gag, dend_icl_clc2)
     result_ik_dend = (dend_ik, dend_ik_kcc2, dend_ik_nkcc1, dend_ik_leak, dend_ik_nak, dend_ik_hh)
     result_ina_dend = (dend_ina, dend_ina_nkcc1, dend_ina_leak, dend_ina_nak, dend_ina_hh)
-    result_icl_soma = (soma_icl, soma_icl_kcc2, soma_icl_nkcc1, soma_icl_leak)
+    result_icl_soma = (soma_icl, soma_icl_kcc2, soma_icl_nkcc1, soma_icl_leak, soma_icl_clc2)
     result_ik_soma = (soma_ik, soma_ik_kcc2, soma_ik_nkcc1, soma_ik_leak, soma_ik_nak, soma_ik_hh)
     result_ina_soma = (soma_ina, soma_ina_nkcc1, soma_ina_leak, soma_ina_nak, soma_ina_hh)
     dend_iother = (dend_ihco3, dend_igaba)
@@ -597,40 +601,81 @@ def save_sim(time_mp_soma, mp_dend,
     dataset3.attrs["puff_longitudinal_diffusion_coefficient"] = dgab
     dataset3.attrs["puff_concentration"] = conc
     dataset3.attrs["Synapses positions"] = syn_pos
-    dataset3.attrs["Shape"] = f"Cloride concentration in dendrite arrays conc_dend[0][0-{int(len(record_location)-1)}]\nPotassium concentration in dendrite arrays conc_dend[1][0-{int(len(record_location)-1)}]\Sodium concentration in dendrite arrays conc_dend[2][0-{int(len(record_location)-1)}]\nGABA concentration out of dendrite arrays conc_dend[3][0-{int(len(record_location)-1)}]"
+    dataset3.attrs["Shape"] = f"""Cloride concentration in dendrite arrays conc_dend[0][0-{int(len(record_location)-1)}]
+    Potassium concentration in dendrite arrays conc_dend[1][0-{int(len(record_location)-1)}]
+    Sodium concentration in dendrite arrays conc_dend[2][0-{int(len(record_location)-1)}]
+    GABA concentration out of dendrite arrays conc_dend[3][0-{int(len(record_location)-1)}]"""
 
     dataset4 = h5_file.create_dataset("conc_soma", data=soma_concentration)
-    dataset4.attrs["Shape"] = "Chloride concentration at 0.5 in soma conc_soma[0]\nPotassium concentration at 0.5 in soma conc_soma[1]\nSodium concentration at 0.5 in soma conc_soma[2]\nExternal GABA concentration at 0.5 in soma conc_soma[3]"
+    dataset4.attrs["Shape"] = f"""Chloride concentration at 0.5 in soma conc_soma[0]
+    Potassium concentration at 0.5 in soma conc_soma[1]
+    Sodium concentration at 0.5 in soma conc_soma[2]
+    External GABA concentration at 0.5 in soma conc_soma[3]"""
 
     dataset5 = h5_file.create_dataset("e_soma", data=reversal_pot_soma)
-    dataset5.attrs["Shape"] = "Ecl at 0.5 in soma e_soma[0]\nEk at 0.5 in soma e_soma[1]\nEna at 0.5 in soma e_soma[2]"
+    dataset5.attrs["Shape"] = f"""Ecl at 0.5 in soma e_soma[0]
+    Ek at 0.5 in soma e_soma[1]
+    Ena at 0.5 in soma e_soma[2]"""
 
     dataset6 = h5_file.create_dataset("e_dend", data=reversal_pot_dend)
-    dataset6.attrs["Shape"] = f"Ecl at synapses in dendrite e_dend[0][0-{int(len(syn_pos)-1)}]\nEk at synapses in dendrite e_dend[1][0-{int(len(syn_pos)-1)}]\nEna at synapses in dendrite revpot[2][0-{int(len(syn_pos)-1)}]"   
+    dataset6.attrs["Shape"] = f"""Ecl at synapses in dendrite e_dend[0][0-{int(len(syn_pos)-1)}]
+    Ek at synapses in dendrite e_dend[1][0-{int(len(syn_pos)-1)}]
+    Ena at synapses in dendrite revpot[2][0-{int(len(syn_pos)-1)}]"""   
 
     dataset7 = h5_file.create_dataset("syn_current_cl", data=dend_currents_cl)
-    dataset7.attrs["Shape"] = f"Icl at synapses syn_current_cl[0][0-{int(len(syn_pos)-1)}]\nIcl_kcc2 at synapses syn_current_cl[1][0-{int(len(syn_pos)-1)}]\nIcl_nkcc1 at synapses syn_current_cl[2][0-{int(len(syn_pos)-1)}]\nIcl_leak at synapses syn_current_cl[3][0-{int(len(syn_pos)-1)}]\nIcl_syn at synapses syn_current_cl[4][0-{int(len(syn_pos)-1)}]"   
+    dataset7.attrs["Shape"] = f"""Icl at synapses syn_current_cl[0][0-{int(len(syn_pos)-1)}]
+    Icl_kcc2 at synapses syn_current_cl[1][0-{int(len(syn_pos)-1)}]
+    Icl_nkcc1 at synapses syn_current_cl[2][0-{int(len(syn_pos)-1)}]
+    Icl_leak at synapses syn_current_cl[3][0-{int(len(syn_pos)-1)}]
+    Icl_syn at synapses syn_current_cl[4][0-{int(len(syn_pos)-1)}]
+    Icl_clc2 at synapses syn_current_cl[5][0-{int(len(syn_pos)-1)}]"""   
 
     dataset8 = h5_file.create_dataset("syn_current_k", data=dend_currents_k)
-    dataset8.attrs["Shape"] = f"Ik at synapses syn_current_k[0][0-{int(len(syn_pos)-1)}]\nIk_kcc2 at synapses syn_current_k[1][0-{int(len(syn_pos)-1)}]\nIk_nkcc1 at synapses syn_current_k[2][0-{int(len(syn_pos)-1)}]\nIk_leak at synapses syn_current_k[3][0-{int(len(syn_pos)-1)}]\nIk_nak at synapses syn_current_k[4][0-{int(len(syn_pos)-1)}]\nIk_hh at synapses syn_current_k[5][0-{int(len(syn_pos)-1)}]"   
+    dataset8.attrs["Shape"] = f"""Ik at synapses syn_current_k[0][0-{int(len(syn_pos)-1)}]
+    Ik_kcc2 at synapses syn_current_k[1][0-{int(len(syn_pos)-1)}]
+    Ik_nkcc1 at synapses syn_current_k[2][0-{int(len(syn_pos)-1)}]
+    Ik_leak at synapses syn_current_k[3][0-{int(len(syn_pos)-1)}]
+    Ik_nak at synapses syn_current_k[4][0-{int(len(syn_pos)-1)}]
+    Ik_hh at synapses syn_current_k[5][0-{int(len(syn_pos)-1)}]"""   
 
     dataset9 = h5_file.create_dataset("syn_current_na", data=dend_currents_na)
-    dataset9.attrs["Shape"] = f"Ina at synapses syn_current_na[0][0-{int(len(syn_pos)-1)}]\nIna_nkcc1 at synapses syn_current_na[1][0-{int(len(syn_pos)-1)}]\nIna_leak at synapses syn_current_na[2][0-{int(len(syn_pos)-1)}]\nIna_nak at synapses syn_current_na[3][0-{int(len(syn_pos)-1)}]\nIna_hh at synapses syn_current_na[4][0-{int(len(syn_pos)-1)}]"   
+    dataset9.attrs["Shape"] = f"""Ina at synapses syn_current_na[0][0-{int(len(syn_pos)-1)}]
+    Ina_nkcc1 at synapses syn_current_na[1][0-{int(len(syn_pos)-1)}]
+    Ina_leak at synapses syn_current_na[2][0-{int(len(syn_pos)-1)}]
+    Ina_nak at synapses syn_current_na[3][0-{int(len(syn_pos)-1)}]
+    Ina_hh at synapses syn_current_na[4][0-{int(len(syn_pos)-1)}]"""   
 
     dataset10 = h5_file.create_dataset("soma_current_cl", data=soma_currents_cl)
-    dataset10.attrs["Shape"] = "Icl at 0.5 in soma soma_current_cl[0]\nIcl_kcc2 at 0.5 in soma soma_current_cl[1]\nIcl_nkcc1 at 0.5 in soma soma_current_cl[2]\nIcl_leak at 0.5 in soma soma_current_cl[3]"   
+    dataset10.attrs["Shape"] = f"""Icl at 0.5 in soma soma_current_cl[0]
+    Icl_kcc2 at 0.5 in soma soma_current_cl[1]
+    Icl_nkcc1 at 0.5 in soma soma_current_cl[2]
+    Icl_leak at 0.5 in soma soma_current_cl[3]
+    Icl_clc2 at 0.5 in soma soma_current_cl[4]"""   
 
     dataset10 = h5_file.create_dataset("soma_current_k", data=soma_currents_k)
-    dataset10.attrs["Shape"] = "Ik at 0.5 in soma soma_current_k[0]\nIk_kcc2 at 0.5 in soma soma_current_k[1]\nIk_nkcc1 at 0.5 in soma soma_current_k[2]\nIk_leak at 0.5 in soma soma_current_k[3]\nIk_hh at 0.5 in soma soma_current_k[4]"   
+    dataset10.attrs["Shape"] = f"""Ik at 0.5 in soma soma_current_k[0]
+    Ik_kcc2 at 0.5 in soma soma_current_k[1]
+    Ik_nkcc1 at 0.5 in soma soma_current_k[2]
+    Ik_leak at 0.5 in soma soma_current_k[3]
+    Ik_hh at 0.5 in soma soma_current_k[4]"""   
 
     dataset11 = h5_file.create_dataset("soma_current_na", data=soma_currents_na)
-    dataset11.attrs["Shape"] = "Ina at 0.5 in soma soma_current_na[0]\nIna_nkcc1 at 0.5 in soma soma_current_na[1]\nIna_leak at 0.5 in soma soma_current_na[2]\nIna_hh at 0.5 in soma soma_current_na[3]"   
+    dataset11.attrs["Shape"] = f"""Ina at 0.5 in soma soma_current_na[0]
+    Ina_nkcc1 at 0.5 in soma soma_current_na[1]
+    Ina_leak at 0.5 in soma soma_current_na[2]
+    Ina_hh at 0.5 in soma soma_current_na[3]"""   
 
     dataset12 = h5_file.create_dataset("syn_current_other", data=dend_currents_other)
-    dataset12.attrs["Shape"] = f"Ihco3 at synapses syn_current_other[0][0-{int(len(syn_pos)-1)}]\nIgaba at synapses syn_current_other[1][0-{int(len(syn_pos)-1)}]"   
+    dataset12.attrs["Shape"] = f"""Ihco3 at synapses syn_current_other[0][0-{int(len(syn_pos)-1)}]
+    Igaba at synapses syn_current_other[1][0-{int(len(syn_pos)-1)}]"""   
 
     dataset13 = h5_file.create_dataset("syn_g_and_o", data=dend_g_and_o)
-    dataset13.attrs["Shape"] = f"gcl at synapses syn_g_and_o[0][0-{int(len(syn_pos)-1)}]\nghco3 at synapses syn_g_and_o[1][0-{int(len(syn_pos)-1)}]\ngrel at synapses syn_g_and_o[2][0-{int(len(syn_pos)-1)}]\nopen state 1 (O1) at synapses syn_g_and_o[3][0-{int(len(syn_pos)-1)}]\nopen state 2 (O2) at synapses syn_g_and_o[4][0-{int(len(syn_pos)-1)}]\nopen state 3 (O3) at synapses syn_g_and_o[5][0-{int(len(syn_pos)-1)}]"   
+    dataset13.attrs["Shape"] = f"""gcl at synapses syn_g_and_o[0][0-{int(len(syn_pos)-1)}]
+    ghco3 at synapses syn_g_and_o[1][0-{int(len(syn_pos)-1)}]
+    grel at synapses syn_g_and_o[2][0-{int(len(syn_pos)-1)}]
+    open state 1 (O1) at synapses syn_g_and_o[3][0-{int(len(syn_pos)-1)}]
+    open state 2 (O2) at synapses syn_g_and_o[4][0-{int(len(syn_pos)-1)}]
+    open state 3 (O3) at synapses syn_g_and_o[5][0-{int(len(syn_pos)-1)}]"""   
 
 
     h5_file.close()
