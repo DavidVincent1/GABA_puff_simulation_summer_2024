@@ -13,7 +13,7 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-path = r"dataset\unclamped_-90mV_syn_nb_20_sim_lenght_800200_dt_(5,5,5)_L_150_kcc2_1e-06_nkcc1_0.00015_rnum=200_puffconc=0_2.0.hdf5"
+path = r"dataset\adult_leak=0.2_clc2_varie\-50mV\clamped=-50mV_synnb=20_simlen=650000_dt=(5,0.144,0.144)_L=150_kcc2=0.0001_nkcc1=1e-05_rnum=200_puffcon=1_Dcl=2_gclc2=5e-06.hdf5"
 f = h5py.File(path, 'r')
 
 
@@ -21,14 +21,14 @@ f = h5py.File(path, 'r')
 #print(list(f.keys()))
 
 
-decal = 700000#480000   # Offset to skip the initial stabilization of the simulation
+decal = 590000#480000   # Offset to skip the initial stabilization of the simulation
 graph_fr = False # If True, the graphs axis, titles and legends will be in french
 
 
 # Graphs choices. Put 1 if you want the graph and 0 if not. -------------------------------------------------------------------
-show_info = 1 # Print information on the simulation
+show_info = 0 # Print information on the simulation
 
-chloride = 0  # Chloride intracellular concentration with multiple curves corresponding to different recording positions
+chloride = 1  # Chloride intracellular concentration with multiple curves corresponding to different recording positions
 potassium = 0 # Potassium intracellular concentration with multiple curves corresponding to different recording positions
 sodium = 0    # Sodium intracellular concentration with multiple curves corresponding to different recording positions
 gab = 0       # GABA extracellular concentration with multiple curves corresponding to different recording positions
@@ -38,8 +38,8 @@ current_soma = 0     # All currents in soma and at one point in dendrite
 rev_pot_soma = 0     # Reversal potentials in soma and at one point in dendrite
 rev_pot_dend_all = 0 # Reversal potentials at each of the 16 first synapses
 
-icl_dend_all = 1            # Chloride currents at each of the 16 first synapses in dendrite
-icl_dend_soma_add_check = 1 # Chloride currents in the soma and at one point in the dendrite
+icl_dend_all = 0            # Chloride currents at each of the 16 first synapses in dendrite
+icl_dend_soma_add_check = 0 # Chloride currents in the soma and at one point in the dendrite
 ik_dend_all = 0             # Potassium currents at each of the 16 first synapses in dendrite
 ik_dend_soma_add_check = 0  # Potassium currents in the soma and at one point in the dendrite
 ina_dend_all = 0            # Sodium currents at each of the 16 first synapses in dendrite
@@ -110,6 +110,9 @@ soma_v = t_and_soma_v[1] # Membrane potential in soma
 # Concentration arrays in dendrite and in soma
 dend_cli, dend_ki, dend_nai, dend_gabo = dend_conc[0], dend_conc[1], dend_conc[2], dend_conc[3]
 soma_cli, soma_ki, soma_nai, soma_gabo = soma_conc[0], soma_conc[1], soma_conc[2], soma_conc[3]
+print(soma_cli[-1])
+print(soma_ki[-1])
+print(soma_nai[-1])
 
 # Chloride currents arrays in dendrite and in soma
 dend_icl, dend_icl_kcc2, dend_icl_nkcc1, dend_icl_leak, dend_icl_synapses, dend_icl_clc2 = dend_current_cl[0], dend_current_cl[1], dend_current_cl[2], dend_current_cl[3], dend_current_cl[4], dend_current_cl[5]
@@ -197,8 +200,8 @@ if chloride == 1:
     arg_min_cl = np.argmin(dend_cli[:, int(decal/5):])
     max_cl = max([np.max(dend_cli[:, int(decal/5):]), np.max(soma_cli[int(decal/5):])])
     min_cl = min([np.min(dend_cli[:, int(decal/5):]), np.min(soma_cli[int(decal/5):])])
-    max_cl = 24
-    min_cl = 15
+    #max_cl = 24
+    #min_cl = 15
 
     fig1, ax1 = plt.subplots(2,1)
     fig1.canvas.manager.set_window_title('[cl]')

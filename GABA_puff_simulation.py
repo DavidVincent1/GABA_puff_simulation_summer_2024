@@ -6,7 +6,7 @@ from neuron.units import ms, mV, mM
 from matplotlib import rcParams
 import numpy as np
 import parameters as p
-from function import NeuronCell, save_sim, syna
+from function import NeuronCell, save_sim, syna, NeuronCellOneFork
 from pathlib import Path
 rcParams.update({'font.size': 22}) # Graph parameters
 
@@ -43,8 +43,30 @@ puff_pos = p.position_of_puff/p.dend_lenght # position of the puff event on the 
 
 
 # Creation of the cell ----------------------------------
-mp = p.clamp_amp # 1500 ms pip, -90 mV
-my_cell = NeuronCell(0,
+if p.clamp:
+    mp = p.clamp_amp # 1500 ms pip, -90 mV
+else:
+    mp = -71*mV
+if p.fork:
+    my_cell = NeuronCellOneFork(0,
+                    number_of_dendrite_segments=p.dend_nseg,
+                    number_of_soma_segments=p.soma_nseg,
+                    number_of_dendrite_segments2=p.dend2_nseg,
+                    number_of_fork_segments=p.fork_nseg,
+                    dendrite_length_um=p.dend_lenght,
+                    dendrite_length_um2=p.dend2_lenght,
+                    fork_length_um=p.fork_lenght,
+                    cli_0=p.intial_cli,
+                    nai_0=p.initial_nai,
+                    ki_0=p.initial_ki,
+                    clo_0=p.clo,
+                    nao_0=p.nao,
+                    ko_0=p.ko,
+                    ukcc2=p.U_kcc2,
+                    unkcc1=p.U_nkcc1,
+                    fork_position=p.fork_position)
+else:
+    my_cell = NeuronCell(0,
                     number_of_dendrite_segments=p.dend_nseg,
                     number_of_soma_segments=p.soma_nseg,
                     number_of_dendrite_segments2=p.dend2_nseg,
@@ -96,10 +118,10 @@ dataset_g_and_o = GABA_puff_event[13]
 
 # path for dataset and name of the file--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 if p.clamp:
-    name = f"voltclamped_{p.clamp_amp}mV_syn_nb_{len(synapse_pos)}_sim_lenght_{p.simulation_lenght}_dt_({p.dt1},{p.dt2},{p.dt3})_L_{p.dend_lenght}_kcc2_{p.U_kcc2}_nkcc1_{p.U_nkcc1}_rnum={p.rnum}_puffconc={p.concentration_of_puff}_{my_cell.dend.DCl_iondifus}_gclc2=_{p.soma_gclc2}.hdf5"
+    name = f"clamp={p.clamp_amp}mV_synnb={len(synapse_pos)}_simlen={p.simulation_lenght}_dt=({p.dt1},{p.dt2},{p.dt3})_L={p.dend_lenght}_kcc2={p.U_kcc2}_nkcc1={p.U_nkcc1}_rnum={p.rnum}_puffco={p.concentration_of_puff}_Dcl={my_cell.dend.DCl_iondifus}_gclc2={p.soma_gclc2}.hdf5"
     filepath_h5 = Path.cwd()/"dataset"/name
 else:
-    name = f"unclamped_{mp}mV_syn_nb_{len(synapse_pos)}_sim_lenght_{p.simulation_lenght}_dt_({p.dt1},{p.dt2},{p.dt3})_L_{p.dend_lenght}_kcc2_{p.U_kcc2}_nkcc1_{p.U_nkcc1}_rnum={p.rnum}_puffconc={p.concentration_of_puff}_{my_cell.dend.DCl_iondifus}.hdf5"
+    name = f"unclamp_{mp}mV_synnb={len(synapse_pos)}_simlen={p.simulation_lenght}_dt=({p.dt1},{p.dt2},{p.dt3})_L={p.dend_lenght}_kcc2={p.U_kcc2}_nkcc1={p.U_nkcc1}_rnum={p.rnum}_puffco={p.concentration_of_puff}_Dcl={my_cell.dend.DCl_iondifus}_gclc2={p.soma_gclc2}.hdf5"
     filepath_h5 = Path.cwd()/"dataset"/name
 
 

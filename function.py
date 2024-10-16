@@ -194,6 +194,233 @@ class NeuronCell:
     def __repr__(self):
         return "BallAndStick[{}]".format(self._gid)
 
+class NeuronCellOneFork:
+    def __init__(self, gid, number_of_dendrite_segments=1, number_of_dendrite_segments2=1,
+                number_of_fork_segments=1, number_of_soma_segments=1, dendrite_length_um=100,
+                dendrite_length_um2=100, fork_length_um=100, cli_0=3.763, nai_0=9.814,
+                ki_0=128.347, clo_0=130.5, nao_0=147.5, ko_0=3.5, ukcc2=0.003, unkcc1=2e-5,
+                fork_position=100/2):
+        self.number_of_dendrite_segments = number_of_dendrite_segments
+        self.number_of_dendrite_segments2 = number_of_dendrite_segments2
+        self.number_of_soma_segments = number_of_soma_segments
+        self.number_of_fork_segments = number_of_fork_segments
+
+        self.dendrite_length_um = dendrite_length_um
+        self.dendrite_length_um2 = dendrite_length_um2
+        self.fork_length_um = fork_length_um
+        self.fork_position = fork_position
+
+        self.cli_0 = cli_0
+        self.nai_0 = nai_0
+        self.ki_0 = ki_0
+        self.clo_0 = clo_0
+        self.nao_0 = nao_0
+        self.ko_0 = ko_0
+        self.gabo_0 = 0
+
+        self._gid = gid
+        self.kcc2 = ukcc2
+        self.nkcc1 = unkcc1
+        self._setup_morphology()
+        self._setup_biophysics()
+
+    def _setup_morphology(self):
+        # Creation of the sections (soma and dendrite)
+        self.soma = h.Section(name="soma", cell=self)
+        self.dend = h.Section(name="dend", cell=self)
+        self.dend2 = h.Section(name="dend2", cell=self)
+        self.fork = h.Section(name="fork", cell=self)
+    
+        # Number of segments in each section
+        self.soma.nseg = self.number_of_soma_segments
+        self.dend.nseg = self.number_of_dendrite_segments
+        self.dend2.nseg = self.number_of_dendrite_segments2
+        self.fork.nseg = self.number_of_fork_segments
+    
+        # Connection of the soma and the dendrite
+        self.dend.connect(self.soma)
+        self.dend2.connect(self.dend)
+        self.fork.connect(self.dend(self.fork_position), 0)
+        self.all = self.soma.wholetree()
+
+        # lenght and diameter of each section
+        self.soma.L = self.soma.diam = p.soma_diam * µm
+        self.dend.L = self.dendrite_length_um * µm
+        self.dend2.L = self.dendrite_length_um2 * µm
+        self.dend.diam = p.dend_diam * µm#1 * µm
+        self.dend2.diam = p.dend2_diam * µm#1 * µm
+        self.fork.L = self.fork_length_um * µm
+
+    def _setup_biophysics(self):
+        # Mecanims insertion in each section
+        self.soma.insert("hhrat")
+        self.soma.insert("iondifus")
+        self.soma.insert("kcc2")
+        self.soma.insert("nkcc1")
+        self.soma.insert("nakpump")
+        self.soma.insert("leak")
+        self.soma.insert("clc2")
+
+        self.dend.insert("hhrat")
+        self.dend.insert("iondifus")
+        self.dend.insert("kcc2")
+        self.dend.insert("nkcc1")
+        self.dend.insert("nakpump")
+        self.dend.insert("leak")
+        self.dend.insert("clc2")
+
+        self.dend2.insert("hhrat")
+        self.dend2.insert("iondifus")
+        self.dend2.insert("kcc2")
+        self.dend2.insert("nkcc1")
+        self.dend2.insert("nakpump")
+        self.dend2.insert("leak")
+        self.dend2.insert("clc2")
+
+        self.fork.insert("hhrat")
+        self.fork.insert("iondifus")
+        self.fork.insert("kcc2")
+        self.fork.insert("nkcc1")
+        self.fork.insert("nakpump")
+        self.fork.insert("leak")
+        self.fork.insert("clc2")
+
+        # Chloride diffusion coefficient
+        self.soma.DCl_iondifus = p.soma_DCl
+        self.dend.DCl_iondifus = p.dend_DCl
+        self.dend2.DCl_iondifus = p.dend2_DCl
+        self.fork.DCl_iondifus = p.fork_DCl
+
+        # set volume and surface for KCC2 and NKCC1 for soma and dendrite
+        self.soma.Vi_kcc2 = self.soma.L*math.pi*(self.soma.diam/2)**2
+        self.soma.S_kcc2 = 2*math.pi*self.soma.diam/2*self.soma.L+2*math.pi*(self.soma.diam/2)**2
+        self.soma.Vi_nkcc1 = self.soma.L*math.pi*(self.soma.diam/2)**2
+        self.soma.S_nkcc1 = 2*math.pi*self.soma.diam/2*self.soma.L+2*math.pi*(self.soma.diam/2)**2
+
+        self.dend.Vi_kcc2 = self.dend.L*math.pi*(self.dend.diam/2)**2
+        self.dend.S_kcc2 = 2*math.pi*self.dend.diam/2*self.dend.L+2*math.pi*(self.dend.diam/2)**2
+        self.dend.Vi_nkcc1 = self.dend.L*math.pi*(self.dend.diam/2)**2
+        self.dend.S_nkcc1 = 2*math.pi*self.dend.diam/2*self.dend.L+2*math.pi*(self.dend.diam/2)**2
+
+        self.dend2.Vi_kcc2 = self.dend2.L*math.pi*(self.dend2.diam/2)**2
+        self.dend2.S_kcc2 = 2*math.pi*self.dend2.diam/2*self.dend2.L+2*math.pi*(self.dend2.diam/2)**2
+        self.dend2.Vi_nkcc1 = self.dend2.L*math.pi*(self.dend2.diam/2)**2
+        self.dend2.S_nkcc1 = 2*math.pi*self.dend2.diam/2*self.dend2.L+2*math.pi*(self.dend2.diam/2)**2
+
+        self.fork.Vi_kcc2 = self.fork.L*math.pi*(self.fork.diam/2)**2
+        self.fork.S_kcc2 = 2*math.pi*self.fork.diam/2*self.fork.L+2*math.pi*(self.fork.diam/2)**2
+        self.fork.Vi_nkcc1 = self.fork.L*math.pi*(self.fork.diam/2)**2
+        self.fork.S_nkcc1 = 2*math.pi*self.fork.diam/2*self.fork.L+2*math.pi*(self.fork.diam/2)**2
+
+        # Na-K pump parameters
+        self.soma.imax_nakpump = p.soma_imax
+        self.dend.imax_nakpump = p.dend_imax
+        self.dend2.imax_nakpump = p.dend2_imax
+        self.fork.imax_nakpump = p.fork_imax
+
+        self.soma.km_k_nakpump = p.soma_kmk
+        self.dend.km_k_nakpump = p.dend_kmk
+        self.dend2.km_k_nakpump = p.dend2_kmk
+        self.fork.km_k_nakpump = p.fork_kmk
+
+        self.soma.km_na_nakpump = p.soma_kmna
+        self.dend.km_na_nakpump = p.dend_kmna
+        self.dend2.km_na_nakpump = p.dend2_kmna
+        self.fork.km_na_nakpump = p.fork_kmna
+
+        # Leak paramters
+        self.soma.gk_leak = p.soma_gk
+        self.dend.gk_leak = p.dend_gk
+        self.dend2.gk_leak = p.dend2_gk
+        self.fork.gk_leak = p.fork_gk
+
+        self.soma.gna_leak = p.soma_gna
+        self.dend.gna_leak = p.dend_gna
+        self.dend2.gna_leak = p.dend2_gna
+        self.fork.gna_leak = p.fork_gna
+
+        self.soma.gnaother_leak = p.soma_gnaother
+        self.dend.gnaother_leak = p.dend_gnaother
+        self.dend2.gnaother_leak = p.dend2_gnaother
+        self.fork.gnaother_leak = p.fork_gnaother
+
+        self.soma.gcl_leak = p.soma_gcl
+        self.dend.gcl_leak = p.dend_gcl
+        self.dend2.gcl_leak = p.dend2_gcl
+        self.fork.gcl_leak = p.fork_gcl
+
+        # There is non specific leak channels in the leak mecanism
+        # and the HH mecanism, but they are not used.
+        self.soma.gfix_leak = 0 
+        self.dend.gfix_leak = 0
+        self.dend2.gfix_leak = 0
+        self.fork.gfix_leak = 0
+        self.soma.gl_hhrat = 0
+        self.dend.gl_hhrat = 0
+        self.dend2.gl_hhrat = 0
+        self.fork.gl_hhrat = 0
+
+        # HH parameters
+        self.soma.gnabar_hhrat = p.soma_gnabar   # valeur originale : .12
+        self.dend.gnabar_hhrat = p.dend_gnabar
+        self.dend2.gnabar_hhrat = p.dend2_gnabar
+        self.fork.gnabar_hhrat = p.fork_gnabar
+
+        self.soma.gkbar_hhrat = p.soma_gkbar # valeur originale : .036
+        self.dend.gkbar_hhrat = p.dend_gkbar
+        self.dend2.gkbar_hhrat = p.dend2_gkbar
+        self.fork.gkbar_hhrat = p.fork_gkbar
+
+        self.soma.U_kcc2 = self.kcc2
+        self.dend.U_kcc2 = self.kcc2 * (self.soma.Vi_kcc2 * self.dend.S_kcc2)/(self.soma.S_kcc2 * self.dend.Vi_kcc2)
+        self.dend2.U_kcc2 = self.kcc2 * (self.soma.Vi_kcc2 * self.dend2.S_kcc2)/(self.soma.S_kcc2 * self.dend2.Vi_kcc2)
+        self.fork.U_kcc2 = self.kcc2 * (self.soma.Vi_kcc2 * self.fork.S_kcc2)/(self.soma.S_kcc2 * self.fork.Vi_kcc2)
+
+        self.soma.U_nkcc1 = self.nkcc1
+        self.dend.U_nkcc1 = self.nkcc1 * (self.soma.Vi_nkcc1 * self.dend.S_nkcc1)/(self.soma.S_nkcc1 * self.dend.Vi_nkcc1)
+        self.dend2.U_nkcc1 = self.nkcc1 * (self.soma.Vi_nkcc1 * self.dend2.S_nkcc1)/(self.soma.S_nkcc1 * self.dend2.Vi_nkcc1)
+        self.fork.U_nkcc1 = self.nkcc1 * (self.soma.Vi_nkcc1 * self.fork.S_nkcc1)/(self.soma.S_nkcc1 * self.fork.Vi_nkcc1)
+
+        # CLC-2 parameters
+        self.soma.gclc2_clc2 = p.soma_gclc2
+        self.dend.gclc2_clc2 = p.dend_gclc2
+        self.dend2.gclc2_clc2 = p.dend2_gclc2
+        self.fork.gclc2_clc2 = p.fork_gclc2
+
+
+
+        for sec1 in self.all:
+            # General cell parameters
+            sec1.Ra = p.axial_resistance
+            sec1.cm = p.membrane_capacitance
+            sec1.clamp_iondifus = 0 # It means there is no voltage clamp initially
+
+            # Initial intracellular concentrations
+            sec1.nai = self.nai_0 # Realistics values : 5 to 30 [mM]
+            sec1.ki = self.ki_0   # Realistics values : 60 to 170 [mM]
+            sec1.cli = self.cli_0 # Realistics values : 8 to 30 [mM]
+            sec1.cli0_iondifus = self.cli_0
+            sec1.nai0_iondifus = self.nai_0
+            sec1.ki0_iondifus = self.ki_0
+            sec1.hco3i0_iondifus = 15 # test 15
+
+            # Extracellular concentrations (fix values)
+            sec1.hco3o0_iondifus = 26 # test 25
+            sec1.nao = self.nao_0
+            sec1.ko = self.ko_0 # 3.5
+            sec1.clo = self.clo_0
+            sec1.clo0_iondifus = self.clo_0
+            sec1.nao0_iondifus = self.nao_0
+            sec1.ko0_iondifus = self.ko_0
+
+            # CLC-2 parameters
+            sec1.vhalf_clc2 = p.vhalf
+            sec1.vslope_clc2 = p.vslope
+            sec1.ptau_clc2 = p.ptau
+
+    def __repr__(self):
+        return "BallAndStick[{}]".format(self._gid)
+
 # Class 1 (_end_) ------------------------------------------------------------------------------------------------------------------------------------------------
 
 
