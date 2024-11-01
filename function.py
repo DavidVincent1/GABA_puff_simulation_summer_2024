@@ -5,6 +5,7 @@ import math
 import h5py
 import numpy as np
 import parameters as p
+import parameters_soma as p1
 
 
 # Class 1 (begin) ------------------------------------------------------------------------------------------------------------------------------------------------
@@ -421,6 +422,109 @@ class NeuronCellOneFork:
     def __repr__(self):
         return "BallAndStick[{}]".format(self._gid)
 
+class Soma:
+    def __init__(self, gid, number_of_soma_segments=1, cli_0=3.763, nai_0=9.814, ki_0=128.347, clo_0=130.5, nao_0=147.5, ko_0=3.5, ukcc2=0.003, unkcc1=2e-5):
+        self.number_of_soma_segments = number_of_soma_segments
+        self.cli_0 = cli_0
+        self.nai_0 = nai_0
+        self.ki_0 = ki_0
+        self.clo_0 = clo_0
+        self.nao_0 = nao_0
+        self.ko_0 = ko_0
+        self._gid = gid
+        self.gabo_0 = 0
+        self.kcc2 = ukcc2
+        self.nkcc1 = unkcc1
+        self._setup_morphology()
+        self._setup_biophysics()
+
+    def _setup_morphology(self):
+        # Creation of the section (soma)
+        self.soma = h.Section(name="soma", cell=self)
+    
+        # Number of segments in each section
+        self.soma.nseg = self.number_of_soma_segments
+
+        # lenght and diameter of each section
+        self.soma.L = self.soma.diam = p.soma_diam * µm
+
+    def _setup_biophysics(self):
+        # Mecanims insertion in each section
+        self.soma.insert("hhrat")
+        self.soma.insert("iondifus")
+        self.soma.insert("kcc2")
+        self.soma.insert("nkcc1")
+        self.soma.insert("nakpump")
+        self.soma.insert("leak")
+        self.soma.insert("clc2")
+
+        # Chloride diffusion coefficient
+        self.soma.DCl_iondifus = p.soma_DCl
+
+        # set volume and surface for KCC2 and NKCC1 for soma and dendrite
+        self.soma.Vi_kcc2 = self.soma.L*math.pi*(self.soma.diam/2)**2
+        self.soma.S_kcc2 = 2*math.pi*self.soma.diam/2*self.soma.L+2*math.pi*(self.soma.diam/2)**2
+        self.soma.Vi_nkcc1 = self.soma.L*math.pi*(self.soma.diam/2)**2
+        self.soma.S_nkcc1 = 2*math.pi*self.soma.diam/2*self.soma.L+2*math.pi*(self.soma.diam/2)**2
+
+        # Na-K pump parameters
+        self.soma.imax_nakpump = p.soma_imax
+        self.soma.km_k_nakpump = p.soma_kmk
+        self.soma.km_na_nakpump = p.soma_kmna
+
+        # Leak paramters
+        self.soma.gk_leak = p.soma_gk
+        self.soma.gna_leak = p.soma_gna
+        self.soma.gnaother_leak = p.soma_gnaother
+        self.soma.gcl_leak = p.soma_gcl
+
+        # There is non specific leak channels in the leak mecanism
+        # and the HH mecanism, but they are not used.
+        self.soma.gfix_leak = 0 
+        self.soma.gl_hhrat = 0
+
+        # HH parameters
+        self.soma.gnabar_hhrat = p.soma_gnabar   # valeur originale : .12
+        self.soma.gkbar_hhrat = p.soma_gkbar # valeur originale : .036
+
+        self.soma.U_kcc2 = self.kcc2
+        self.soma.U_nkcc1 = self.nkcc1
+
+        # CLC-2 parameters
+        self.soma.gclc2_clc2 = p.soma_gclc2
+
+        # General cell parameters
+        self.soma.Ra = p.axial_resistance
+        self.soma.cm = p.membrane_capacitance
+        self.soma.clamp_iondifus = 0 # It means there is no voltage clamp initially
+
+        # Initial intracellular concentrations
+        self.soma.nai = self.nai_0 # Realistics values : 5 to 30 [mM]
+        self.soma.ki = self.ki_0   # Realistics values : 60 to 170 [mM]
+        self.soma.cli = self.cli_0 # Realistics values : 8 to 30 [mM]
+        self.soma.cli0_iondifus = self.cli_0
+        self.soma.nai0_iondifus = self.nai_0
+        self.soma.ki0_iondifus = self.ki_0
+        self.soma.hco3i0_iondifus = 15 # test 15
+
+        # Extracellular concentrations (fix values)
+        self.soma.hco3o0_iondifus = 26 # test 25
+        self.soma.nao = self.nao_0
+        self.soma.ko = self.ko_0 # 3.5
+        self.soma.clo = self.clo_0
+        self.soma.clo0_iondifus = self.clo_0
+        self.soma.nao0_iondifus = self.nao_0
+        self.soma.ko0_iondifus = self.ko_0
+
+        # CLC-2 parameters
+        self.soma.vhalf_clc2 = p.vhalf
+        self.soma.vslope_clc2 = p.vslope
+        self.soma.ptau_clc2 = p.ptau
+
+    def __repr__(self):
+        return "BallAndStick[{}]".format(self._gid)
+
+
 # Class 1 (_end_) ------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -736,6 +840,116 @@ def syna(cell, puff_pos, puff_time, puff_conc, pos, tau, dgab, rnum, clamp=False
 
     return result_mp, result_mp_dend, result_con_dend, result_con_soma, result_e_soma, result_e_dend, result_icl_dend, result_ik_dend, result_ina_dend, result_icl_soma, result_ik_soma, result_ina_soma, dend_iother, result_g
 
+def choc_potass(cell, clamp=False, clamp_amp=-70, rmp_initial=-72.38, sim_time=10000, skip=0, choc_time=10000, kchoc=13.5, tauchoc=10000):
+    # Initialization at 0 of the 'messenger' concentration ----------
+    # This 'messenger' makes the link between the puff (puff.mod) and
+    # the extracellular GABA concentration (iondiffus.mod)
+    for seg in cell.soma:
+        seg.messi = 0
+    
+    # Setting the potassic choc ------------------------
+    choc = h.CHOCpot(cell.soma(0.5))
+    choc.tchoc = choc_time * ms
+    choc.kchoc = kchoc * mM
+    choc.tauchoc = tauchoc * ms
+    choc.ko0 = p1.ko
+
+    # Recording vectors for concentrations --------------
+    soma_cli = h.Vector().record(cell.soma(0.5)._ref_cli)
+    soma_ko = h.Vector().record(cell.soma(0.5)._ref_ko)
+    soma_nai = h.Vector().record(cell.soma(0.5)._ref_nai)
+    soma_ki = h.Vector().record(cell.soma(0.5)._ref_ki)
+
+    # Chloride currents, soma ---------------------------------------
+    soma_icl = h.Vector().record(cell.soma(0.5)._ref_icl)
+    soma_icl_kcc2 = h.Vector().record(cell.soma(0.5)._ref_icl_kcc2)
+    soma_icl_nkcc1 = h.Vector().record(cell.soma(0.5)._ref_icl_nkcc1)
+    soma_icl_leak = h.Vector().record(cell.soma(0.5)._ref_icl_leak)
+    soma_icl_clc2 = h.Vector().record(cell.soma(0.5)._ref_icl_clc2)
+
+    # Potassium currents, soma ------------------------------------
+    soma_ik = h.Vector().record(cell.soma(0.5)._ref_ik)
+    soma_ik_kcc2 = h.Vector().record(cell.soma(0.5)._ref_ik_kcc2)
+    soma_ik_nkcc1 = h.Vector().record(cell.soma(0.5)._ref_ik_nkcc1)
+    soma_ik_leak = h.Vector().record(cell.soma(0.5)._ref_ik_leak)
+    soma_ik_nak = h.Vector().record(cell.soma(0.5)._ref_ik_nakpump)
+    soma_ik_hh = h.Vector().record(cell.soma(0.5)._ref_ik_hhrat)
+
+    # Sodium currents, soma -----------------------------------------
+    soma_ina = h.Vector().record(cell.soma(0.5)._ref_ina)
+    soma_ina_nkcc1 = h.Vector().record(cell.soma(0.5)._ref_ina_nkcc1)
+    soma_ina_leak = h.Vector().record(cell.soma(0.5)._ref_ina_leak)
+    soma_ina_nak = h.Vector().record(cell.soma(0.5)._ref_ina_nakpump)
+    soma_ina_hh = h.Vector().record(cell.soma(0.5)._ref_ina_hhrat)
+
+    # Recording vectors for reversal potential, soma ----
+    soma_ecl = h.Vector().record(cell.soma(0.5)._ref_ecl)
+    soma_ena = h.Vector().record(cell.soma(0.5)._ref_ena)
+    soma_ek = h.Vector().record(cell.soma(0.5)._ref_ek)
+
+    # Recording vector for membrane potential, soma -
+    soma_v = h.Vector().record(cell.soma(0.5)._ref_v)
+
+    # Recording vector for the time and initialization of the membrane potential
+    t = h.Vector().record(h._ref_t)
+    if clamp:
+        h.finitialize(clamp_amp*mV)
+    else:
+        h.finitialize(rmp_initial)
+
+
+    # Simulation -------------------------------------------
+    # Separated in 3 temporal window
+    # First at dt1 for the initial stabilization of the cell
+    # Second at dt2 for the time juste before the puff
+    # Third at dt3 for the rest of the simulation 
+    h.tstop = sim_time
+    if sim_time > skip:
+        h.dt = p.dt1*ms
+        h.continuerun(skip*ms)
+    h.dt = p.dt2*ms
+    h.continuerun((choc_time-100)*ms)
+    h.dt = p.dt3*ms
+    h.continuerun(sim_time)
+
+
+    # Surface of the soma ----------------------------
+    # Correspond to (segment lenght) * (circonference)
+    soma_surface_area = cell.soma(0.5).area()
+    soma_surface_area *= (1e-8) # in cm2
+
+    # Current density to total current conversion in soma
+    soma_icl *= soma_surface_area * (1e9)
+    soma_icl_kcc2 *= soma_surface_area * (1e9)
+    soma_icl_nkcc1 *= soma_surface_area * (1e9)
+    soma_icl_leak *= soma_surface_area * (1e9)
+    soma_icl_clc2 *= soma_surface_area * (1e9)
+
+    soma_ik *= soma_surface_area * (1e9)
+    soma_ik_kcc2 *= soma_surface_area * (1e9)
+    soma_ik_nkcc1 *= soma_surface_area * (1e9)
+    soma_ik_leak *= soma_surface_area * (1e9)
+    soma_ik_nak *= soma_surface_area * (1e9)
+    soma_ik_hh *= soma_surface_area * (1e9)
+
+    soma_ina *= soma_surface_area * (1e9)
+    soma_ina_nkcc1 *= soma_surface_area * (1e9)
+    soma_ina_leak *= soma_surface_area * (1e9)
+    soma_ina_nak *= soma_surface_area * (1e9)
+    soma_ina_hh *= soma_surface_area * (1e9)
+
+
+    # Results tuple that will be return by the function ------------------------------------------
+    result_mp = (t, soma_v)
+    result_con_soma = (soma_cli, soma_ki, soma_nai, soma_ko)
+    result_e_soma = (soma_ecl, soma_ek, soma_ena)
+    result_icl_soma = (soma_icl, soma_icl_kcc2, soma_icl_nkcc1, soma_icl_leak, soma_icl_clc2)
+    result_ik_soma = (soma_ik, soma_ik_kcc2, soma_ik_nkcc1, soma_ik_leak, soma_ik_nak, soma_ik_hh)
+    result_ina_soma = (soma_ina, soma_ina_nkcc1, soma_ina_leak, soma_ina_nak, soma_ina_hh)
+
+    return result_mp, result_con_soma, result_e_soma, result_icl_soma, result_ik_soma, result_ina_soma
+
+
 # Function 2 (_end_) ------------------------------------------------------------------------------------------------------------------------------------------------
 
 
@@ -906,6 +1120,65 @@ def save_sim(time_mp_soma, mp_dend,
 
 
     h5_file.close()
+
+def save_sim_choc_potass(time_mp_soma, soma_concentration,
+                        reversal_pot_soma, soma_currents_cl,
+                        soma_currents_k, soma_currents_na, filepath,
+                        dt, sim_lenght, rmp, skcc2, snkcc1, cl_i, cl_o, na_i,
+                        na_o, k_i, k_o, volt_clamp=False, clamp_v=False):
+    h5_file = h5py.File(filepath, "w")
+
+    dataset1 = h5_file.create_dataset("mp_soma", data=time_mp_soma)
+    dataset1.attrs["Shape"] = f"Time array mp_soma[0]\nMP at 0.5 in soma mp_soma[1]"
+
+    dataset2 = h5_file.create_dataset("conc_soma", data=soma_concentration)
+    dataset2.attrs["temporal_resolution"] = dt
+    dataset2.attrs["simulation_length"] = sim_lenght
+    dataset2.attrs["voltage_clamped"] = volt_clamp
+    dataset2.attrs["voltage_clamp_mV"] = clamp_v
+    dataset2.attrs["initial_membrane_potential_mV"] = rmp
+    dataset2.attrs["kcc2_strength"] = skcc2
+    dataset2.attrs["nkcc1_strength"] = snkcc1
+    dataset2.attrs["cli_0"] = cl_i
+    dataset2.attrs["clo_0"] = cl_o
+    dataset2.attrs["nai_0"] = na_i
+    dataset2.attrs["nao_0"] = na_o
+    dataset2.attrs["ki_0"] = k_i
+    dataset2.attrs["ko_0"] = k_o
+    dataset2.attrs["Shape"] = f"""Chloride concentration at 0.5 in soma conc_soma[0]
+    Potassium concentration at 0.5 in soma conc_soma[1]
+    Sodium concentration at 0.5 in soma conc_soma[2]
+    External GABA concentration at 0.5 in soma conc_soma[3]
+    Potassium extracellular concentration at 0.5 in soma conc_soma[4]"""
+
+    dataset3 = h5_file.create_dataset("e_soma", data=reversal_pot_soma)
+    dataset3.attrs["Shape"] = f"""Ecl at 0.5 in soma e_soma[0]
+    Ek at 0.5 in soma e_soma[1]
+    Ena at 0.5 in soma e_soma[2]""" 
+
+    dataset4 = h5_file.create_dataset("soma_current_cl", data=soma_currents_cl)
+    dataset4.attrs["Shape"] = f"""Icl at 0.5 in soma soma_current_cl[0]
+    Icl_kcc2 at 0.5 in soma soma_current_cl[1]
+    Icl_nkcc1 at 0.5 in soma soma_current_cl[2]
+    Icl_leak at 0.5 in soma soma_current_cl[3]
+    Icl_clc2 at 0.5 in soma soma_current_cl[4]"""   
+
+    dataset5 = h5_file.create_dataset("soma_current_k", data=soma_currents_k)
+    dataset5.attrs["Shape"] = f"""Ik at 0.5 in soma soma_current_k[0]
+    Ik_kcc2 at 0.5 in soma soma_current_k[1]
+    Ik_nkcc1 at 0.5 in soma soma_current_k[2]
+    Ik_leak at 0.5 in soma soma_current_k[3]
+    Ik_hh at 0.5 in soma soma_current_k[4]"""   
+
+    dataset6 = h5_file.create_dataset("soma_current_na", data=soma_currents_na)
+    dataset6.attrs["Shape"] = f"""Ina at 0.5 in soma soma_current_na[0]
+    Ina_nkcc1 at 0.5 in soma soma_current_na[1]
+    Ina_leak at 0.5 in soma soma_current_na[2]
+    Ina_hh at 0.5 in soma soma_current_na[3]"""    
+
+
+    h5_file.close()
+
 
 # Function 3 (_end_) ------------------------------------------------------------------------------------------------------------------------------------------------
 

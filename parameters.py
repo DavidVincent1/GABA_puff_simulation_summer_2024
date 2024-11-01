@@ -1,5 +1,5 @@
 import math
-from neuron.units import mV, µm, mM, ms
+from neuron.units import mM, ms
 
 
 # Temporal parameters -------------------------------------------------------------------------------------------------------
@@ -51,11 +51,11 @@ dend2_lenght = 330 # Dendrite (second part) lenght [µm]
 dend2_diam = 1     # Dendrite (secpnd part) diameter [µm]
 dend2_nseg = 21    # Number of segments in dendrite (second part) [-]
 
-fork = False                    # True if you want the cell to have a fork [-]
-fork_position = 100/dend_lenght # Position of the fork on the dendrite (first part, between 0 and 1) [-]
+fork = True                     # True if you want the cell to have a fork [-]
+fork_position = 120/dend_lenght  # Position of the fork on the dendrite (first part, between 0 and 1) [-]
 fork_lenght = 100               # Fork length [µm]
 fork_diam = 1                   # Fork diameter [µm]
-fork_nseg = 6                   # Number of segments in fork [-]
+fork_nseg = 167                 # Number of segments in fork [-]
 
 
 # kcc2.mod and nkcc1.mod parameters -------------------------------------------------------------------
@@ -134,10 +134,10 @@ fork_gkbar = 0.036*factor  # Maximum HH channels conductance for potassium in fo
 
 
 # clc2.mod ----------------------------------------------------------------------------------
-soma_gclc2 = 5e-5  # Maximum conductance of CLC-2 channels in soma [S/cm2] 
-dend_gclc2 = 5e-5  # Maximum conductance of CLC-2 channels in dendrite (first part) [S/cm2] 
-dend2_gclc2 = 5e-5 # Maximum conductance of CLC-2 channels in dendrite (second part) [S/cm2]
-fork_gclc2 = 5e-5  # Maximum conductance of CLC-2 channels in fork [S/cm2]
+soma_gclc2 = 1e-5  # Maximum conductance of CLC-2 channels in soma [S/cm2] 
+dend_gclc2 = 1e-5  # Maximum conductance of CLC-2 channels in dendrite (first part) [S/cm2] 
+dend2_gclc2 = 1e-5 # Maximum conductance of CLC-2 channels in dendrite (second part) [S/cm2]
+fork_gclc2 = 1e-5  # Maximum conductance of CLC-2 channels in fork [S/cm2]
 
 ptau = 300         # Parameter in the equation of the opened probabilities [ms] 
 vhalf = 15         # Parameter in the equation of the opened probabilities [mV]
@@ -197,5 +197,5 @@ cli, ki, nai = 6.5844, 115.04, 13.530
 # U_kcc2 = 1e-4   # Maximum KCC2 pump strength [mM/ms]
 # U_nkcc1 = 1e-5  # Maximum NKCC1 pump strength [mM/ms]
 # Leak cl = 0.2e-5
-# Clamped at -50 mV
-#cli, ki, nai = 6.5844, 115.04, 13.530
+# Fork
+cli, ki, nai

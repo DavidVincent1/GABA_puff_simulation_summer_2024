@@ -14,7 +14,7 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-path = r"Path of the dataset file"
+path = r"dataset\fork\clamp=-50mV_synnb=20_simlen=650000_dt=(5,0.144,0.144)_L=150_kcc2=0.0001_nkcc1=1e-05_rnum=200_puffco=1.00_Dcl=2.0_gclc2=1e-05_fork=0.47.hdf5"
 f = h5py.File(path, 'r')
 
 
@@ -23,23 +23,23 @@ f = h5py.File(path, 'r')
 
 
 # Offset to skip the initial stabilization of the data and language used on the graph. ----------
-decal = 500000    # Th animation will be from decal to simulation lenght - end skip
-end_skip = 70000  # in ms
+decal = 600000    # The animation will be from decal to simulation lenght - end skip
+end_skip = 10000  # in ms
 skip = 10         # The animation will only take 1/skip data for the animation
 skip2 = 150       # The animation will only take 1/skip2 data for the animation (toward the end)
-time_dt1 = 500000 # Duration of the simulation at dt1 in ms
+time_dt1 = 600000 # Duration of the simulation at dt1 in ms
 time_dt2 = 100    # Duration of the simulation at dt2 in ms
-time_dt3 = 89900  # Duration of the simulation at dt3 in ms
+time_dt3 = 49900  # Duration of the simulation at dt3 in ms
 
 
 # Choose the animation you want -------------------------------------------------------------------------------------
 show_info = 0               # Show information on the simulation
-anim_chlore = 0             # Animation for chloride and GABA concentration as a function of the position on dendrite
-save_anim_chlore = 0        # If you want to save the animation (can take time)
+anim_chlore = 1             # Animation for chloride and GABA concentration as a function of the position on dendrite
+save_anim_chlore = 1        # If you want to save the animation (can take time)
 anim_icl = 0                # Animation for chloride currents as a function of the position on dendrite (2 panels)
 save_anim_icl = 0           # If you want to save the animation (can take time)
-anim_open_channels = 1      # Animation for the currents created by the synapses
-save_anim_open_channels = 1 # If you want to save the animation (can take time)
+anim_open_channels = 0      # Animation for the currents created by the synapses
+save_anim_open_channels = 0 # If you want to save the animation (can take time)
 anim_all_four = 0           # All the above anumation in one figure with four panels
 save_anim_all_four = 0      # If you want to save the anumation (can take time)
 

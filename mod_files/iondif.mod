@@ -18,7 +18,7 @@ NEURON {
 	USEION cl READ icl WRITE cli, clo VALENCE -1
 	USEION hco3 READ hco3i, hco3o VALENCE -1
 	USEION na READ ina WRITE nai, nao VALENCE 1
-	USEION k READ ik WRITE ki, ko VALENCE 1
+	USEION k READ ik WRITE ki VALENCE 1
 	USEION gab READ gabo WRITE gabo VALENCE 0
 	USEION mess READ messi VALENCE 0
 	GLOBAL vrat, DGab, taugaba, fhspace, areaext		:vrat must be GLOBAL
@@ -135,7 +135,7 @@ INITIAL {
 	nai = nai0
 	nao = nao0
 	ki = ki0
-	ko = ko0
+	:ko = ko0
 	gabo = 0
 	hco3i = hco3i0
 	hco3o = hco3o0
@@ -215,5 +215,5 @@ KINETIC state {
 
 	clo = clo0
 	nao = nao0
-	ko = ko0
+	:ko = ko0
 }

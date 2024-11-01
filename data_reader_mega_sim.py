@@ -13,7 +13,9 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
 #f = h5py.file(r"Path of the dataset file", 'r')
-path = r"dataset\adult_leak=0.2_clc2_varie\-50mV\clamped=-50mV_synnb=20_simlen=650000_dt=(5,0.144,0.144)_L=150_kcc2=0.0001_nkcc1=1e-05_rnum=200_puffcon=1_Dcl=2_gclc2=5e-06.hdf5"
+#path = r"dataset\adult_leak=0.2_clc2_varie\-50mV\clamped=-50mV_synnb=20_simlen=650000_dt=(5,0.144,0.144)_L=150_kcc2=0.0001_nkcc1=1e-05_rnum=200_puffcon=1_Dcl=2_gclc2=1e-05.hdf5"
+#path = r"dataset\clamp=-50mV_synnb=20_simlen=650000_dt=(5,0.144,0.144)_L=150_kcc2=0.0001_nkcc1=1e-05_rnum=200_puffco=1_Dcl=2.0_gclc2=1e-05_fork=0.6_6seg.hdf5"
+path = r"dataset\ratio_leak-clc2\voltclamped_-50mV_syn_nb_20_sim_lenght_1000200_dt_(5,5,5)_L_150_kcc2_0.0001_nkcc1_1e-05_rnum=200_puffconc=0_2.0_gclc2=_7.5e-06_(25-75).hdf5"
 f = h5py.File(path, 'r')
 
 
@@ -21,14 +23,14 @@ f = h5py.File(path, 'r')
 #print(list(f.keys()))
 
 
-decal = 590000#480000   # Offset to skip the initial stabilization of the simulation
+decal = 590000   # Offset to skip the initial stabilization of the simulation
 graph_fr = False # If True, the graphs axis, titles and legends will be in french
 
 
 # Graphs choices. Put 1 if you want the graph and 0 if not. -------------------------------------------------------------------
 show_info = 0 # Print information on the simulation
 
-chloride = 1  # Chloride intracellular concentration with multiple curves corresponding to different recording positions
+chloride = 0  # Chloride intracellular concentration with multiple curves corresponding to different recording positions
 potassium = 0 # Potassium intracellular concentration with multiple curves corresponding to different recording positions
 sodium = 0    # Sodium intracellular concentration with multiple curves corresponding to different recording positions
 gab = 0       # GABA extracellular concentration with multiple curves corresponding to different recording positions
@@ -117,6 +119,8 @@ print(soma_nai[-1])
 # Chloride currents arrays in dendrite and in soma
 dend_icl, dend_icl_kcc2, dend_icl_nkcc1, dend_icl_leak, dend_icl_synapses, dend_icl_clc2 = dend_current_cl[0], dend_current_cl[1], dend_current_cl[2], dend_current_cl[3], dend_current_cl[4], dend_current_cl[5]
 soma_icl, soma_icl_kcc2, soma_icl_nkcc1, soma_icl_leak, soma_icl_clc2 = soma_current_cl[0], soma_current_cl[1], soma_current_cl[2], soma_current_cl[3], soma_current_cl[4]
+print(soma_icl_leak[-1])
+print(soma_icl_clc2[-1])
 
 # Potassium currents arrays in dendrite and in soma
 dend_ik, dend_ik_kcc2, dend_ik_nkcc1, dend_ik_leak, dend_ik_nak, dend_ik_hh = dend_current_k[0], dend_current_k[1], dend_current_k[2], dend_current_k[3], dend_current_k[4], dend_current_k[5]
@@ -272,8 +276,8 @@ if chloride == 1:
     # If you want to manually choose the location of the legend
     manual = True
     if manual:
-        ax1[0].legend(loc='lower left')
-        ax1[1].legend(loc='lower left')
+        ax1[0].legend(loc='upper right')
+        ax1[1].legend(loc='upper right')
 
 del dend_cli_begin
 del dend_cli_end
