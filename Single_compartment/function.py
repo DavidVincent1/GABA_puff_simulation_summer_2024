@@ -111,6 +111,111 @@ class Soma:
     def __repr__(self):
         return "BallAndStick[{}]".format(self._gid)
 
+class Soma_leak_on_clc2:
+    def __init__(self, gid, number_of_soma_segments=1, cli_0=3.763, nai_0=9.814, ki_0=128.347, clo_0=130.5,
+                nao_0=147.5, ko_0=3.5, ukcc2=0.003, unkcc1=2e-5, gcl_leak=1e-5, gclc2=1e-5):
+        self.number_of_soma_segments = number_of_soma_segments
+        self.cli_0 = cli_0
+        self.nai_0 = nai_0
+        self.ki_0 = ki_0
+        self.clo_0 = clo_0
+        self.nao_0 = nao_0
+        self.ko_0 = ko_0
+        self._gid = gid
+        self.gabo_0 = 0
+        self.kcc2 = ukcc2
+        self.nkcc1 = unkcc1
+        self.gcl_leak = gcl_leak
+        self.gclc2 = gclc2
+        self._setup_morphology()
+        self._setup_biophysics()
+
+    def _setup_morphology(self):
+        # Creation of the section (soma)
+        self.soma = h.Section(name="soma", cell=self)
+    
+        # Number of segments in each section
+        self.soma.nseg = self.number_of_soma_segments
+
+        # lenght and diameter of each section
+        self.soma.L = self.soma.diam = p.soma_diam * µm
+
+    def _setup_biophysics(self):
+        # Mecanims insertion in each section
+        self.soma.insert("hhrat")
+        self.soma.insert("iondifus")
+        self.soma.insert("kcc2")
+        self.soma.insert("nkcc1")
+        self.soma.insert("nakpump")
+        self.soma.insert("leak")
+        self.soma.insert("clc2")
+
+        # Chloride diffusion coefficient
+        self.soma.DCl_iondifus = p.soma_DCl
+
+        # set volume and surface for KCC2 and NKCC1 for soma and dendrite
+        self.soma.Vi_kcc2 = self.soma.L*math.pi*(self.soma.diam/2)**2
+        self.soma.S_kcc2 = 2*math.pi*self.soma.diam/2*self.soma.L+2*math.pi*(self.soma.diam/2)**2
+        self.soma.Vi_nkcc1 = self.soma.L*math.pi*(self.soma.diam/2)**2
+        self.soma.S_nkcc1 = 2*math.pi*self.soma.diam/2*self.soma.L+2*math.pi*(self.soma.diam/2)**2
+
+        # Na-K pump parameters
+        self.soma.imax_nakpump = p.soma_imax
+        self.soma.km_k_nakpump = p.soma_kmk
+        self.soma.km_na_nakpump = p.soma_kmna
+
+        # Leak paramters
+        self.soma.gk_leak = p.soma_gk
+        self.soma.gna_leak = p.soma_gna
+        self.soma.gnaother_leak = p.soma_gnaother
+        self.soma.gcl_leak = self.gcl_leak
+
+        # There is non specific leak channels in the leak mecanism
+        # and the HH mecanism, but they are not used.
+        self.soma.gfix_leak = 0 
+        self.soma.gl_hhrat = 0
+
+        # HH parameters
+        self.soma.gnabar_hhrat = p.soma_gnabar   # valeur originale : .12
+        self.soma.gkbar_hhrat = p.soma_gkbar # valeur originale : .036
+
+        self.soma.U_kcc2 = self.kcc2
+        self.soma.U_nkcc1 = self.nkcc1
+
+        # CLC-2 parameters
+        self.soma.gclc2_clc2 = self.gclc2
+
+        # General cell parameters
+        self.soma.Ra = p.axial_resistance
+        self.soma.cm = p.membrane_capacitance
+        self.soma.clamp_iondifus = 0 # It means there is no voltage clamp initially
+
+        # Initial intracellular concentrations
+        self.soma.nai = self.nai_0 # Realistics values : 5 to 30 [mM]
+        self.soma.ki = self.ki_0   # Realistics values : 60 to 170 [mM]
+        self.soma.cli = self.cli_0 # Realistics values : 8 to 30 [mM]
+        self.soma.cli0_iondifus = self.cli_0
+        self.soma.nai0_iondifus = self.nai_0
+        self.soma.ki0_iondifus = self.ki_0
+        self.soma.hco3i0_iondifus = 15 # test 15
+
+        # Extracellular concentrations (fix values)
+        self.soma.hco3o0_iondifus = 26 # test 25
+        self.soma.nao = self.nao_0
+        self.soma.ko = self.ko_0 # 3.5
+        self.soma.clo = self.clo_0
+        self.soma.clo0_iondifus = self.clo_0
+        self.soma.nao0_iondifus = self.nao_0
+        self.soma.ko0_iondifus = self.ko_0
+
+        # CLC-2 parameters
+        self.soma.vhalf_clc2 = p.vhalf
+        self.soma.vslope_clc2 = p.vslope
+        self.soma.ptau_clc2 = p.ptau
+
+    def __repr__(self):
+        return "BallAndStick[{}]".format(self._gid)
+
 
 # Class 1 (_end_) ------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -386,9 +491,8 @@ def show_info_sim(time_mp_soma, mp_dend,
 
 # Function 5 (begin) ------------------------------------------------------------------------------------------------------------------------------------------------
 # Simulation for 2D matix
-def syna_kcc2_nkcc1(first, cell, puff_pos, puff_time, puff_conc, pos, tau, dgab, rnum, clamp=False,
-        clamp_amp=-70, rmp_initial=-72.38, sim_time=10000, record_pos=np.linspace(0.01,0.99,100),
-        skip=0, pipette=(1500*ms, 8*mM, 140*mM, 12*mM)):
+def syna_kcc2_nkcc1_soma(cell, choc_time, kchoc, tauchoc, clamp=False, clamp_amp=-70,
+                    rmp_initial=-72.38, sim_time=10000, skip=0, pipette=(1500*ms, 8*mM, 140*mM, 12*mM)):
     """_summary_
 
     Args:
@@ -416,16 +520,6 @@ def syna_kcc2_nkcc1(first, cell, puff_pos, puff_time, puff_conc, pos, tau, dgab,
         _type_: _description_
     """
 
-    # Creation des arrays nécessaires --------------------------------
-    if len(pos) == 1:
-        if pos[0] < 1: position = pos
-        else: position = np.linspace(0.01, 0.99, pos[0])
-    else:
-        position = pos # entre 0 et 1
-
-    if len(rnum) == 1: rnum_ = [rnum[0] for _ in range(len(position))]
-    else: rnum_ = rnum
-
     # If the soma is voltage clamped -----------------------------------------------------------
     if clamp:
         # Simulate an electrode
@@ -442,54 +536,36 @@ def syna_kcc2_nkcc1(first, cell, puff_pos, puff_time, puff_conc, pos, tau, dgab,
     h.kipip_iondifus = pipette[2]  # Potassium concentration in piette solution [mM]
     h.naipip_iondifus = pipette[3] # Sodium concentration in piette solution [mM]
 
-
-    # GABA diffusion parameters -----------------------------------------------
-    h.DGab_iondifus = dgab       # Diffusion coefficient of GABA [µm2/ms]
-    h.taugaba_iondifus = tau*ms  # Exchange with bath constant ([GABA]=0) [ms]
-    h.fhspace_iondifus = 0.3* µm # width of the anulus in wich GABA diffuse [µm]
-
-
-    # GABA puff event -----------------------------------------------------------------
-    stim = h.NetStim()                    # Creation of the structure of the GABA puff
-    stim.number = 1                       # Number of events
-    stim.start = puff_time                # Time at wich the event occurs
-    puff = h.gabpuff(cell.dend(puff_pos)) # Creation of the puff 
-
-    # Makes the connection between the event and the simulation (stim and puff mecanism) 
-    netcon = h.NetCon(stim, puff, 0, 0, 0, sec=cell.dend)
-    netcon.weight[0] = puff_conc # Define the GABA puff concentration
-
-
-    # Synapses --------------------------------------------------------------------
-    gaba_R = [0]*len(position) # To stock the synapses
-    for i in range(len(position)):
-        gaba_R[i] = h.gaghk(cell.dend(position[i])) # Creation of the point process
-        gaba_R[i].Rnumber = rnum_[i]                # Number of GABA receptors
-
+    # Setting the potassic choc ------------------------
+    choc = h.CHOCpot(cell.soma(0.5))
+    choc.tchoc = choc_time * ms
+    choc.kchoc = kchoc * mM
+    choc.tauchoc = tauchoc * ms
+    choc.ko0 = p.ko
 
     # Initialization at 0 of the 'messenger' concentration ----------
     # This 'messenger' makes the link between the puff (puff.mod) and
     # the extracellular GABA concentration (iondiffus.mod)
-    for seg in cell.all:
+    for seg in cell.soma:
         seg.messi = 0
 
-
-    # Recording vectors for chloride concentration in dendrite --
-    dend_cli = []
-    for j in record_pos:
-        dend_cli.append(h.Vector().record(cell.dend(j)._ref_cli))
-
-
-    # Recording vectors for ionic concentrations in soma -
+    # Recording vectors for concentrations --------------
     soma_cli = h.Vector().record(cell.soma(0.5)._ref_cli)
     soma_nai = h.Vector().record(cell.soma(0.5)._ref_nai)
     soma_ki = h.Vector().record(cell.soma(0.5)._ref_ki)
 
+    # Chloride currents, soma ---------------------------------------
+    soma_icl = h.Vector().record(cell.soma(0.5)._ref_icl)
+    soma_icl_kcc2 = h.Vector().record(cell.soma(0.5)._ref_icl_kcc2)
+    soma_icl_nkcc1 = h.Vector().record(cell.soma(0.5)._ref_icl_nkcc1)
+    soma_icl_leak = h.Vector().record(cell.soma(0.5)._ref_icl_leak)
+    soma_icl_clc2 = h.Vector().record(cell.soma(0.5)._ref_icl_clc2)
 
-    # Recording vectors for Ecl reversal potential and membrane potential, soma
+    # Recording vectors for reversal potential, soma ----
     soma_ecl = h.Vector().record(cell.soma(0.5)._ref_ecl)
-    soma_v = h.Vector().record(cell.soma(0.5)._ref_v)
 
+    # Recording vector for membrane potential, soma -
+    soma_v = h.Vector().record(cell.soma(0.5)._ref_v)
 
     # Recording vector for the time and initialization of the membrane potential
     t = h.Vector().record(h._ref_t)
@@ -497,7 +573,6 @@ def syna_kcc2_nkcc1(first, cell, puff_pos, puff_time, puff_conc, pos, tau, dgab,
         h.finitialize(clamp_amp*mV)
     else:
         h.finitialize(rmp_initial)
-
 
     # Simulation -------------------------------------------
     # Separated in 3 temporal window
@@ -509,46 +584,42 @@ def syna_kcc2_nkcc1(first, cell, puff_pos, puff_time, puff_conc, pos, tau, dgab,
         h.dt = p.dt1*ms
         h.continuerun(skip*ms)
     h.dt = p.dt2*ms
-    h.continuerun((puff_time-100)*ms)
+    h.continuerun((choc_time-100)*ms)
     h.dt = p.dt3*ms
     h.continuerun(sim_time)
 
+    # Surface of the soma ----------------------------
+    # Correspond to (segment lenght) * (circonference)
+    soma_surface_area = cell.soma(0.5).area()
+    soma_surface_area *= (1e-8) # in cm2
 
-    # Index of GABA puff event in the arrays ------------------
-    if first == True:
-        puff_ind = 0
-        for i, val in enumerate(t):
-            if abs(puff_time-val) < abs(puff_time-t[puff_ind]):
-                puff_ind = i
-    else:
-        puff_ind = first
-    
+    # Current density to total current conversion in soma
+    soma_icl *= soma_surface_area * (1e9)
+    soma_icl_kcc2 *= soma_surface_area * (1e9)
+    soma_icl_nkcc1 *= soma_surface_area * (1e9)
+    soma_icl_leak *= soma_surface_area * (1e9)
+    soma_icl_clc2 *= soma_surface_area * (1e9)
 
     # Index of the time just before the GABA puff event
-    stable_conc = int(puff_ind - 2)
+    potassic_ind = int(skip/p.dt1 + (choc_time-skip)/p.dt2)
+    stable_conc = int(potassic_ind - 2)
 
-
-    # Stable values of chloride concentrations ---------------------------------------------------------
-    stable_chloride = [dend_cli[i][stable_conc] for i in range(len(dend_cli))] + [soma_cli[stable_conc]]
-
-    # Maximum delta chloride -----------------------------------------------------------------------------------------------------
-    dend_cli_numpy = [np.array(dend_cli[i]) for i in range(len(dend_cli))]
+    # Maximum delta chloride -----------------------------------
     soma_cli_numpy = np.array(soma_cli)
 
-    max_chloride_list = [max(dend_cli_numpy[i][puff_ind:]) for i in range(len(dend_cli_numpy))] + [max(soma_cli_numpy[puff_ind:])]
-    min_chloride_list = [min(dend_cli_numpy[i][puff_ind:]) for i in range(len(dend_cli_numpy))] + [min(soma_cli_numpy[puff_ind:])]
-    max_chloride_list = np.asarray(max_chloride_list)
-    min_chloride_list = np.asarray(min_chloride_list)
-    stable_chloride = np.asarray(stable_chloride)
+    max_chloride = max(soma_cli_numpy[potassic_ind:])
+    min_chloride = min(soma_cli_numpy[potassic_ind:])
 
-    delta_chloride_max = np.max(max_chloride_list - stable_chloride)
-    delta_chloride_min = np.min(min_chloride_list - stable_chloride)
+    delta_chloride_max = max_chloride - soma_cli[stable_conc]
+    delta_chloride_min = min_chloride - soma_cli[stable_conc]
     delta_chloride = 0
     if abs(delta_chloride_max) > abs(delta_chloride_min):
         delta_chloride = delta_chloride_max
     else:
         delta_chloride = delta_chloride_min
 
-    return delta_chloride, soma_cli[stable_conc], soma_ki[stable_conc], soma_nai[stable_conc], soma_v[stable_conc], soma_ecl[stable_conc], soma_nai, soma_ki, soma_cli, soma_v, t
+    return (delta_chloride, soma_cli[stable_conc], soma_ki[stable_conc], soma_nai[stable_conc], soma_v[stable_conc], 
+            soma_ecl[stable_conc], soma_cli, soma_ki, soma_nai, soma_v, t, soma_icl[stable_conc], soma_icl_kcc2[stable_conc],
+            soma_icl_nkcc1[stable_conc], soma_icl_clc2[stable_conc], soma_icl_leak[stable_conc])
 
 # Function 5 (_end_) ------------------------------------------------------------------------------------------------------------------------------------------------

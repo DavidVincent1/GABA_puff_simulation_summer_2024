@@ -12,7 +12,7 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
-path = r"Test_soma\unclamped_somasim_simlen=650000_dt=(5,0.025,0.025)_test.hdf5"
+path = r"Single_compartment\dataset\unclamped_somasim_simlen=650000_dt=(5,0.025,0.025)_test.hdf5"
 f = h5py.File(path, 'r')
 
 
@@ -27,9 +27,9 @@ graph_fr = False # If True, the graphs axis, titles and legends will be in frenc
 # Graphs choices. Put 1 if you want the graph and 0 if not. -----------------------------------------------------------------------
 show_info = 0 # Print information on the simulation
 
-important = 1 # Intracellular concentrations in soma, extracellular potassium concentration, membrane potential, reversal potentials
+important = 0 # Intracellular concentrations in soma, extracellular potassium concentration, membrane potential, reversal potentials
 
-concentration = 0  # Intracellular concentrations in soma
+concentration = 1  # Intracellular concentrations in soma
 
 mp_soma = 0          # 2 graphs : Membrane potential in soma and at one point in dendrite. Membrane potentials at each synapse.
 current_soma = 0     # All currents in soma and at one point in dendrite

@@ -3,21 +3,21 @@ from neuron.units import ms, mM
 
 
 # Temporal parameters -------------------------------------------------------------------------------------------------------
-time_for_stabilization = 600000  # Time for initial stabilization of the cell during simulation [ms]
-simulation_lenght = 650000       # Time for the whole simulation. Must be > time_for_stabilization [ms]
+time_for_stabilization = 1990000  # Time for initial stabilization of the cell during simulation [ms]
+simulation_lenght = 2000200       # Time for the whole simulation. Must be > time_for_stabilization [ms]
 dt1 = 5                          # dt1 for (0 to skip) : first stabilisation [ms]
 dt2 = 0.025                      # dt2 for (skip to puff time) : just before the puff [ms]
 dt3 = 0.025                      # dt3 for (puff time to simulation lenght) : real integration during the GABA puff event [ms]
 
 
 # Potassic choc ---------------------------------
-tchoc = 600100  # Time of the potassic event [ms]
+tchoc = 2000100  # Time of the potassic event [ms]
 kchoc = 13.5    # Concentration [mM]
 tauchoc = 1000 # Time constant [ms]
 
 
 # Voltage clamp parameters ----------------------------------------------------------------------------------------------
-clamp = True                            # True : the soma is voltage clamped and False : the soma is not voltage clamped.
+clamp = False                           # True : the soma is voltage clamped and False : the soma is not voltage clamped.
 clamp_amp = -50                         # Amplitude of the clamp [mV]
 pipett = (1500*ms, 8*mM, 140*mM, 12*mM) # Pipette parameters (if the soma is voltage clamped)
                                             # pipett[0] : Exchange constant with the pipette
@@ -30,6 +30,8 @@ pipett = (1500*ms, 8*mM, 140*mM, 12*mM) # Pipette parameters (if the soma is vol
 soma_lenght = 20   # Soma lenght [µm]
 soma_diam = 20     # Soma diameter [µm]
 soma_nseg = 1      # Number of segments in soma [-]
+soma_surf = 2*math.pi*(soma_diam/2)*soma_lenght + 2*math.pi*(soma_diam/2)**2 # Surface [µm2]
+soma_vol = soma_lenght*math.pi*(soma_diam/2)**2                              # Volume [µm3]
 
 
 # kcc2.mod and nkcc1.mod parameters -------------------------------------------------------------------
@@ -37,14 +39,13 @@ soma_nseg = 1      # Number of segments in soma [-]
 # entered in each of these sections is ajusted so that the maximum current density created by
 # the mecanisms is uniform on the cell. The parameters here are the value for the soma.
 
-U_kcc2 = 1e-4     # Maximum KCC2 pump strength [mM/ms]
+U_kcc2 = 1e-6     # Maximum KCC2 pump strength [mM/ms]
 U_nkcc1 = 1e-5    # Maximum NKCC1 pump strength [mM/ms]
 
-V = soma_lenght*math.pi*(soma_diam/2)**2                             # Volume of soma [um3]
-S = 2*math.pi*(soma_diam/2)*soma_lenght + 2*math.pi*(soma_diam/2)**2 # Surface of soma [um2]
-F = 96485.309                                                        # Faraday constant [faraday]
-print("Current density (KCC2) [mA/cm2] : ", (U_kcc2*F*V)/(S*1e4))    # Current density caused by KCC2
-print("Current density (NKCC1) [mA/cm2] : ", (U_nkcc1*F*V)/(S*1e4))  # Current density caused by NKCC1
+F = 96485.309     # Faraday constant [faraday]
+
+#print("Current density (KCC2) [mA/cm2] : ", (U_kcc2*F*soma_vol)/(soma_surf*1e4))    # Current density caused by KCC2
+#print("Current density (NKCC1) [mA/cm2] : ", (U_nkcc1*F*soma_vol)/(soma_surf*1e4))  # Current density caused by NKCC1
 
 
 # iondif.mod parameters ---------------------------------------------------------
@@ -84,17 +85,23 @@ axial_resistance = 100   # Axial resistance in all the cell [Ohm * cm]
 membrane_capacitance = 1 # Membrane capacitance [micro Farads/cm2]
 temperature = 23         # Temperature during the simulation [degC]
 
-intial_cli = 6.5844  # Initial intracellular chloride concentration in cell [mM]
-initial_ki = 115.04  # Initial intracellular potassium concentration in cell [mM]
-initial_nai = 13.530 # Initial intracellular sodium concentration in cell [mM]
+intial_cli = 24      # Initial intracellular chloride concentration in cell [mM]
+initial_ki = 135     # Initial intracellular potassium concentration in cell [mM]
+initial_nai = 12     # Initial intracellular sodium concentration in cell [mM]
 clo = 130.5          # Extracellular chloride concentration [mM]
 ko = 3.5             # Extracellular potassium concentration [mM]
 nao = 147.25         # Extracellular sodium concentration [mM]
 
 
 # Fix points --------------------------------------------
-# U_kcc2 = 1e-6     # Maximum KCC2 pump strength [mM/ms]
-# U_nkcc1 = 1.5e-4  # Maximum NKCC1 pump strength [mM/ms]
-# Leak cl = 1e-5
+# U_kcc2 = 1e-5     # Maximum KCC2 pump strength [mM/ms]
+# U_nkcc1 = 1e-6  # Maximum NKCC1 pump strength [mM/ms]
+# ratio leak on clc2
 # Unclamped
-cli, ki, nai = 27.731, 179.972, 12.939
+cli, ki, nai = 6.9, 117, 12
+
+# U_kcc2 = 1e-6     # Maximum KCC2 pump strength [mM/ms]
+# U_nkcc1 = 1e-5  # Maximum NKCC1 pump strength [mM/ms]
+# ratio leak on clc2
+# Unclamped
+cli, ki, nai = 24, 135, 12
