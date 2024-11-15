@@ -222,7 +222,7 @@ class Soma_leak_on_clc2:
 
 # Function 2 (begin) ------------------------------------------------------------------------------------------------------------------------------------------------
 # Main function to do the GABA puff simulation
-def choc_potass(cell, clamp=False, clamp_amp=-70, rmp_initial=-72.38, sim_time=10000, skip=0, choc_time=10000, kchoc=13.5, tauchoc=10000):
+def choc_potass(cell, clamp=False, clamp_amp=-70, rmp_initial=-72.38, sim_time=10000, skip=0, choc_time=10000, kchoc=13.5, tauchoc=10000, tdur=10000):
     # Initialization at 0 of the 'messenger' concentration ----------
     # This 'messenger' makes the link between the puff (puff.mod) and
     # the extracellular GABA concentration (iondiffus.mod)
@@ -235,6 +235,7 @@ def choc_potass(cell, clamp=False, clamp_amp=-70, rmp_initial=-72.38, sim_time=1
     choc.kchoc = kchoc * mM
     choc.tauchoc = tauchoc * ms
     choc.ko0 = p.ko
+    choc.tdur = tdur * ms
 
     # Recording vectors for concentrations --------------
     soma_cli = h.Vector().record(cell.soma(0.5)._ref_cli)

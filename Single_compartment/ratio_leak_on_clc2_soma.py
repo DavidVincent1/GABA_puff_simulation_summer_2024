@@ -272,9 +272,9 @@ if __name__ == '__main__':
     if save_:
         # To save the graphs as pickle files.
         if p.clamp:
-            folder_path = filepath + f'\pickle_{nb_ratio}_gclc2={gclc2[0]:.2g}-{gclc2[-1]:.2g}gleak={gcl_leak[0]:.2g}-{gcl_leak[-1]:.2g}_Ukcc2={(p.U_kcc2*p.F*p.soma_vol)/(p.soma_surf*1e4):.2g}_Unkcc1={(p.U_nkcc1*p.F*p.soma_vol)/(p.soma_surf*1e4):.2g}_clamp={p.clamp_amp}'
+            folder_path = filepath + f'\pickle_{nb_ratio}_gclc2={gclc2[0]:.2g}-{gclc2[-1]:.2g}_gleak={gcl_leak[0]:.2g}-{gcl_leak[-1]:.2g}_Ukcc2={(p.U_kcc2*p.F*p.soma_vol)/(p.soma_surf*1e4):.2g}_Unkcc1={(p.U_nkcc1*p.F*p.soma_vol)/(p.soma_surf*1e4):.2g}_clamp={p.clamp_amp}'
         else:
-            folder_path = filepath + f'\pickle_{nb_ratio}_gclc2={gclc2[0]:.2g}-{gclc2[-1]:.2g}gleak={gcl_leak[0]:.2g}-{gcl_leak[-1]:.2g}_Ukcc2={(p.U_kcc2*p.F*p.soma_vol)/(p.soma_surf*1e4):.2g}_Unkcc1={(p.U_nkcc1*p.F*p.soma_vol)/(p.soma_surf*1e4):.2g}_unclamp'
+            folder_path = filepath + f'\pickle_{nb_ratio}_gclc2={gclc2[0]:.2g}-{gclc2[-1]:.2g}_gleak={gcl_leak[0]:.2g}-{gcl_leak[-1]:.2g}_Ukcc2={(p.U_kcc2*p.F*p.soma_vol)/(p.soma_surf*1e4):.2g}_Unkcc1={(p.U_nkcc1*p.F*p.soma_vol)/(p.soma_surf*1e4):.2g}_unclamp'
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
         else:

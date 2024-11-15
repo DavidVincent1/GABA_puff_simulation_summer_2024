@@ -12,7 +12,7 @@ plt.rcParams['animation.ffmpeg_path'] = 'ffmpeg'
 
 # Loading the h5py dataset ---------------------------------------------------------------------------------------------------------------------------------------------------------------
 # INPUT
-path = r"Single_compartment\dataset\unclamped_somasim_simlen=650000_dt=(5,0.025,0.025)_test.hdf5"
+path = r"Single_compartment\dataset\unclamped_somasim_simlen=4e+06_dt=(25,25,25)_kcc2=1e-05_nkcc1=0.0001_gclc2=1.8e-05_.hdf5"
 f = h5py.File(path, 'r')
 
 
@@ -20,24 +20,26 @@ f = h5py.File(path, 'r')
 #print(list(f.keys()))
 
 
-decal = 590000   # Offset to skip the initial stabilization of the simulation
-graph_fr = False # If True, the graphs axis, titles and legends will be in french
+decal = 1900000   # Offset to skip the initial stabilization of the simulation
+dt_decal = 25     #
+graph_fr = False  # If True, the graphs axis, titles and legends will be in french
 
 
 # Graphs choices. Put 1 if you want the graph and 0 if not. -----------------------------------------------------------------------
 show_info = 0 # Print information on the simulation
 
-important = 0 # Intracellular concentrations in soma, extracellular potassium concentration, membrane potential, reversal potentials
+important = 1 # Intracellular concentrations in soma, extracellular potassium concentration, membrane potential, reversal potentials
 
-concentration = 1  # Intracellular concentrations in soma
+concentration = 0  # Intracellular concentrations in soma
+chloride_conc = 0
 
 mp_soma = 0          # 2 graphs : Membrane potential in soma and at one point in dendrite. Membrane potentials at each synapse.
 current_soma = 0     # All currents in soma and at one point in dendrite
 rev_pot_soma = 0     # Reversal potentials in soma and at one point in dendrite
 
 icl_dend_soma_add_check = 1 # Chloride currents in the soma and at one point in the dendrite
-ik_dend_soma_add_check = 1  # Potassium currents in the soma and at one point in the dendrite
-ina_dend_soma_add_check = 1 # Sodium currents in the soma and at one point in the dendrite
+ik_dend_soma_add_check = 0  # Potassium currents in the soma and at one point in the dendrite
+ina_dend_soma_add_check = 0 # Sodium currents in the soma and at one point in the dendrite
 
 
 # Separation of the dataset in arrays ----------------------------------------------------
@@ -103,31 +105,31 @@ if important == 1:
     ax[0,0].set_xlabel("Time (s)")
     ax[0,0].set_ylabel(r"$[K^+]_o$ (mM)")
     ax[0,0].set_xlim(xlimit_min, xlimit_max)
-    ax[0,0].set_ylim(min(soma_ko[int(decal/5):])-1, max(soma_ko[int(decal/5):])+1)
+    ax[0,0].set_ylim(min(soma_ko[int(decal/dt_decal):])-1, max(soma_ko[int(decal/dt_decal):])+1)
 
     ax[1,0].plot(t, soma_ki, color="darkgreen")
     ax[1,0].set_xlabel("Time (s)")
     ax[1,0].set_ylabel(r"$[K^+]_i$ (mM)")
     ax[1,0].set_xlim(xlimit_min, xlimit_max)
-    ax[1,0].set_ylim(min(soma_ki[int(decal/5):])-1, max(soma_ki[int(decal/5):])+1)
+    ax[1,0].set_ylim(min(soma_ki[int(decal/dt_decal):])-1, max(soma_ki[int(decal/dt_decal):])+1)
 
     ax[0,1].plot(t, soma_cli, color='orange')
     ax[0,1].set_xlabel("Time (s)")
     ax[0,1].set_ylabel(r"$[Cl^-]_i$ (mM)")
     ax[0,1].set_xlim(xlimit_min, xlimit_max)
-    ax[0,1].set_ylim(min(soma_cli[int(decal/5):])-1, max(soma_cli[int(decal/5):])+1)
+    ax[0,1].set_ylim(min(soma_cli[int(decal/dt_decal):])-1, max(soma_cli[int(decal/dt_decal):])+1)
 
     ax[1,1].plot(t, soma_nai, color='blue')
     ax[1,1].set_xlabel("Time (s)")
     ax[1,1].set_ylabel(r"$[Na^+]_i$ (mM)")
     ax[1,1].set_xlim(xlimit_min, xlimit_max)
-    ax[1,1].set_ylim(min(soma_nai[int(decal/5):])-1, max(soma_nai[int(decal/5):])+1)
+    ax[1,1].set_ylim(min(soma_nai[int(decal/dt_decal):])-1, max(soma_nai[int(decal/dt_decal):])+1)
 
     ax[0,2].plot(t, soma_v, color="black")
     ax[0,2].set_xlabel("Time (s)")
     ax[0,2].set_ylabel(r"MP (mV)")
     ax[0,2].set_xlim(xlimit_min, xlimit_max)
-    ax[0,2].set_ylim(min(soma_v[int(decal/5):])-1, max(soma_v[int(decal/5):])+1)
+    ax[0,2].set_ylim(min(soma_v[int(decal/dt_decal):])-1, max(soma_v[int(decal/dt_decal):])+1)
 
     ax[1,2].plot(t, soma_v, color="black", label='MP')
     ax[1,2].plot(t, soma_ecl, color="orange", label=r'$E_{cl}$')
@@ -136,9 +138,9 @@ if important == 1:
     ax[1,2].set_xlabel("Time (s)")
     ax[1,2].set_ylabel(r"Potential (mV)")
     ax[1,2].set_xlim(xlimit_min, xlimit_max)
-    ax[1,2].set_ylim(min([min(soma_v[int(decal/5):]), min(soma_ecl[int(decal/5):]), min(soma_ek[int(decal/5):]), min(soma_ena[int(decal/5):])])-1,
-                    max([max(soma_v[int(decal/5):]), max(soma_ecl[int(decal/5):]), max(soma_ek[int(decal/5):]), max(soma_ena[int(decal/5):])])+1)
-    ax[1,2].legend(fontsize=16)
+    ax[1,2].set_ylim(min([min(soma_v[int(decal/dt_decal):]), min(soma_ecl[int(decal/dt_decal):]), min(soma_ek[int(decal/dt_decal):]), min(soma_ena[int(decal/dt_decal):])])-1,
+                    max([max(soma_v[int(decal/dt_decal):]), max(soma_ecl[int(decal/dt_decal):]), max(soma_ek[int(decal/dt_decal):]), max(soma_ena[int(decal/dt_decal):])])+1)
+    ax[1,2].legend(loc='center right', fontsize=16)
 
 
 
@@ -165,10 +167,17 @@ if concentration == 1:
     ax[1,0].set_xlim(xlimit_min, xlimit_max)
     ax[1,1].set_xlim(xlimit_min, xlimit_max)
 
-    ax[0,0].set_ylim(min(soma_ko[int(decal/5):])-1, max(soma_ko[int(decal/5):])+1)
-    ax[0,1].set_ylim(min(soma_cli[int(decal/5):])-1, max(soma_cli[int(decal/5):])+1)
-    ax[1,0].set_ylim(min(soma_nai[int(decal/5):])-1, max(soma_nai[int(decal/5):])+1)
-    ax[1,1].set_ylim(min(soma_ki[int(decal/5):])-1, max(soma_ki[int(decal/5):])+1)
+    ax[0,0].set_ylim(min(soma_ko[int(decal/dt_decal):])-1, max(soma_ko[int(decal/dt_decal):])+1)
+    ax[0,1].set_ylim(min(soma_cli[int(decal/dt_decal):])-1, max(soma_cli[int(decal/dt_decal):])+1)
+    ax[1,0].set_ylim(min(soma_nai[int(decal/dt_decal):])-1, max(soma_nai[int(decal/dt_decal):])+1)
+    ax[1,1].set_ylim(min(soma_ki[int(decal/dt_decal):])-1, max(soma_ki[int(decal/dt_decal):])+1)
+
+if chloride_conc == 1:
+    plt.figure("Chloride_concentration")
+    plt.plot(t, soma_cli, color='orange')
+    plt.xlim(xlimit_min, xlimit_max)
+    plt.ylabel(r'$[Cl^-]_i$ (mM)')
+    plt.xlabel("Time (ms)")
 
 del soma_cli, soma_ki, soma_ko, soma_nai
 
@@ -184,7 +193,7 @@ if mp_soma == 1:
         plt.xlabel('Time [ms]')
         plt.ylabel('Membrane potential [mV]')
     plt.xlim(xlimit_min, xlimit_max)
-    plt.ylim(min(soma_v[int(decal/5):])-1, max(soma_v[int(decal/5):])+1)
+    plt.ylim(min(soma_v[int(decal/dt_decal):])-1, max(soma_v[int(decal/dt_decal):])+1)
 
 if current_soma == 1:
     plt.figure('Ionic_currents_soma')
@@ -202,8 +211,8 @@ if current_soma == 1:
         plt.ylabel('Ionic current [pA]')
     #plt.plot(t, soma_icl + soma_ik + soma_ina, label=r"$I_{cl}+I_{k}+I_{na}$", color='black', linestyle='--')
     plt.xlim(xlimit_min, xlimit_max)
-    plt.ylim(min([min(soma_icl[int(decal/5):]), min(soma_ik[int(decal/5):]), min(soma_ina[int(decal/5):])])-1,
-            max([max(soma_icl[int(decal/5):]), max(soma_ik[int(decal/5):]), max(soma_ina[int(decal/5):])])+1)
+    plt.ylim(min([min(soma_icl[int(decal/dt_decal):]), min(soma_ik[int(decal/dt_decal):]), min(soma_ina[int(decal/dt_decal):])])-1,
+            max([max(soma_icl[int(decal/dt_decal):]), max(soma_ik[int(decal/dt_decal):]), max(soma_ina[int(decal/dt_decal):])])+1)
     plt.legend()
 
 if rev_pot_soma == 1:
@@ -226,8 +235,8 @@ if rev_pot_soma == 1:
         plt.xlabel('Time [s]')
         plt.ylabel('Reversal potential [mV]')
     plt.xlim(xlimit_min, xlimit_max)
-    plt.ylim(min([min(soma_ecl[int(decal/5):]), min(soma_ek[int(decal/5):]), min(soma_ena[int(decal/5):]), min(soma_v[int(decal/5):])])-1,
-            max([max(soma_ecl[int(decal/5):]), max(soma_ek[int(decal/5):]), max(soma_ena[int(decal/5):]), max(soma_v[int(decal/5):])])+1)
+    plt.ylim(min([min(soma_ecl[int(decal/dt_decal):]), min(soma_ek[int(decal/dt_decal):]), min(soma_ena[int(decal/dt_decal):]), min(soma_v[int(decal/dt_decal):])])-1,
+            max([max(soma_ecl[int(decal/dt_decal):]), max(soma_ek[int(decal/dt_decal):]), max(soma_ena[int(decal/dt_decal):]), max(soma_v[int(decal/dt_decal):])])+1)
     plt.legend(loc='upper right')
 
 del soma_v
@@ -237,12 +246,12 @@ del soma_ena
 
 
 if icl_dend_soma_add_check == 1:
-    max_icl_soma = max([max(soma_icl[int(decal/5):]),
-                        max(soma_icl_clc2[int(decal/5):]), max(soma_icl_kcc2[int(decal/5):]),
-                        max(soma_icl_nkcc1[int(decal/5):]), max(soma_icl_leak[int(decal/5):])])+1
-    min_icl_soma = min([min(soma_icl[int(decal/5):]),
-                        min(soma_icl_clc2[int(decal/5):]), min(soma_icl_kcc2[int(decal/5):]),
-                        min(soma_icl_nkcc1[int(decal/5):]), min(soma_icl_leak[int(decal/5):])])-1
+    max_icl_soma = max([max(soma_icl[int(decal/dt_decal):]),
+                        max(soma_icl_clc2[int(decal/dt_decal):]), max(soma_icl_kcc2[int(decal/dt_decal):]),
+                        max(soma_icl_nkcc1[int(decal/dt_decal):]), max(soma_icl_leak[int(decal/dt_decal):])])+1
+    min_icl_soma = min([min(soma_icl[int(decal/dt_decal):]),
+                        min(soma_icl_clc2[int(decal/dt_decal):]), min(soma_icl_kcc2[int(decal/dt_decal):]),
+                        min(soma_icl_nkcc1[int(decal/dt_decal):]), min(soma_icl_leak[int(decal/dt_decal):])])-1
 
     plt.figure('Chloride_currents_soma')
     if graph_fr:
@@ -262,15 +271,16 @@ if icl_dend_soma_add_check == 1:
             label=r'$I_{cl,kcc2}+I_{cl,nkcc1}+I_{cl,leak}+I_{cl,clc2}$', color="black", linestyle='--', alpha=0.3, lw=1.5)
     plt.xlim(xlimit_min, xlimit_max)
     plt.ylim(min_icl_soma, max_icl_soma)
+    #plt.legend(loc='lower left')
     plt.legend(loc='upper right')
 
 if ik_dend_soma_add_check == 1:
-    max_ik_soma = max([max(soma_ik[int(decal/5):]), max(soma_ik_hh[int(decal/5):]),
-                        max(soma_ik_nak[int(decal/5):]), max(soma_ik_kcc2[int(decal/5):]),
-                        max(soma_ik_nkcc1[int(decal/5):]), max(soma_ik_leak[int(decal/5):])])+1
-    min_ik_soma = min([min(soma_ik[int(decal/5):]), min(soma_ik_hh[int(decal/5):]),
-                        min(soma_ik_nak[int(decal/5):]), min(soma_ik_kcc2[int(decal/5):]),
-                        min(soma_ik_nkcc1[int(decal/5):]), min(soma_ik_leak[int(decal/5):])])-1
+    max_ik_soma = max([max(soma_ik[int(decal/dt_decal):]), max(soma_ik_hh[int(decal/dt_decal):]),
+                        max(soma_ik_nak[int(decal/dt_decal):]), max(soma_ik_kcc2[int(decal/dt_decal):]),
+                        max(soma_ik_nkcc1[int(decal/dt_decal):]), max(soma_ik_leak[int(decal/dt_decal):])])+1
+    min_ik_soma = min([min(soma_ik[int(decal/dt_decal):]), min(soma_ik_hh[int(decal/dt_decal):]),
+                        min(soma_ik_nak[int(decal/dt_decal):]), min(soma_ik_kcc2[int(decal/dt_decal):]),
+                        min(soma_ik_nkcc1[int(decal/dt_decal):]), min(soma_ik_leak[int(decal/dt_decal):])])-1
     plt.figure(f'Potassium_currents_soma')
     if graph_fr:
         plt.title(f'Courants de potassium dans le soma')
@@ -294,12 +304,12 @@ if ik_dend_soma_add_check == 1:
     plt.legend(loc='upper right')
 
 if ina_dend_soma_add_check == 1:
-    max_ina_soma = max([max(soma_ina[int(decal/5):]), max(soma_ina_hh[int(decal/5):]),
-                        max(soma_ina_nak[int(decal/5):]),
-                        max(soma_ina_nkcc1[int(decal/5):]), max(soma_ina_leak[int(decal/5):])])+1
-    min_ina_soma = min([min(soma_ina[int(decal/5):]), min(soma_ina_hh[int(decal/5):]),
-                        min(soma_ina_nak[int(decal/5):]),
-                        min(soma_ina_nkcc1[int(decal/5):]), min(soma_ina_leak[int(decal/5):])])-1
+    max_ina_soma = max([max(soma_ina[int(decal/dt_decal):]), max(soma_ina_hh[int(decal/dt_decal):]),
+                        max(soma_ina_nak[int(decal/dt_decal):]),
+                        max(soma_ina_nkcc1[int(decal/dt_decal):]), max(soma_ina_leak[int(decal/dt_decal):])])+1
+    min_ina_soma = min([min(soma_ina[int(decal/dt_decal):]), min(soma_ina_hh[int(decal/dt_decal):]),
+                        min(soma_ina_nak[int(decal/dt_decal):]),
+                        min(soma_ina_nkcc1[int(decal/dt_decal):]), min(soma_ina_leak[int(decal/dt_decal):])])-1
     plt.figure(f'Sodium_currents_soma')
     if graph_fr:
         plt.title(f'Courants de sodium dans le soma')

@@ -41,6 +41,8 @@ range_nkcc1 = 0.5e-6, 1e-4 # Range will begin at range_nkcc1[0] and end at range
 
 Ukcc2 = np.linspace(range_kcc2[1], range_kcc2[0], nb_kcc2)     # Range of U_KCC2 values
 Unkcc1 = np.linspace(range_nkcc1[0], range_nkcc1[1], nb_nkcc1) # Range of U_nkc1 values
+print(Ukcc2)
+print(Unkcc1)
 
 
 # Arrays for results ---------------------------------
@@ -334,9 +336,9 @@ if __name__ == '__main__':
     if save_:
         # To save the graphs as pickle files.
         if p.clamp:
-            folder_path = filepath + f'\pickle_{nb_kcc2}x{nb_nkcc1}_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}_gclc2={p.soma_gclc2}_leak={p.soma_gcl}_clamp={p.clamp_amp}'
+            folder_path = filepath + f'\pickle_{nb_kcc2}_x_{nb_nkcc1}_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}_gclc2={p.soma_gclc2:.2g}_leak={p.soma_gcl:.2g}_clamp={p.clamp_amp}'
         else:
-            folder_path = filepath + f'\pickle_{nb_kcc2}x{nb_nkcc1}_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}_gclc2={p.soma_gclc2}_leak={p.soma_gcl}_unclamp'
+            folder_path = filepath + f'\pickle_{nb_kcc2}_x_{nb_nkcc1}_kcc2={range_kcc2[0]}-{range_kcc2[1]}_nkcc1={range_nkcc1[0]}-{range_nkcc1[1]}_gclc2={p.soma_gclc2:.2g}_leak={p.soma_gcl:.2g}_unclamp'
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
         else:

@@ -3,17 +3,18 @@ from neuron.units import ms, mM
 
 
 # Temporal parameters -------------------------------------------------------------------------------------------------------
-time_for_stabilization = 1990000  # Time for initial stabilization of the cell during simulation [ms]
-simulation_lenght = 2000200       # Time for the whole simulation. Must be > time_for_stabilization [ms]
-dt1 = 5                          # dt1 for (0 to skip) : first stabilisation [ms]
-dt2 = 0.025                      # dt2 for (skip to puff time) : just before the puff [ms]
-dt3 = 0.025                      # dt3 for (puff time to simulation lenght) : real integration during the GABA puff event [ms]
+time_for_stabilization = 2000000   # Time for initial stabilization of the cell during simulation [ms]
+simulation_lenght = 4000000        # Time for the whole simulation. Must be > time_for_stabilization [ms]
+dt1 = 25                           # dt1 for (0 to skip) : first stabilisation [ms]
+dt2 = 25                           # dt2 for (skip to puff time) : just before the puff [ms]
+dt3 = 25                           # dt3 for (puff time to simulation lenght) : real integration during the GABA puff event [ms]
 
 
 # Potassic choc ---------------------------------
 tchoc = 2000100  # Time of the potassic event [ms]
-kchoc = 13.5    # Concentration [mM]
-tauchoc = 1000 # Time constant [ms]
+kchoc = 13.5     # Concentration [mM]
+tauchoc = 15000  # Time constant [ms]
+tdur = 600000    # Duration of the potassic event [ms]
 
 
 # Voltage clamp parameters ----------------------------------------------------------------------------------------------
@@ -39,7 +40,7 @@ soma_vol = soma_lenght*math.pi*(soma_diam/2)**2                              # V
 # entered in each of these sections is ajusted so that the maximum current density created by
 # the mecanisms is uniform on the cell. The parameters here are the value for the soma.
 
-U_kcc2 = 1e-6     # Maximum KCC2 pump strength [mM/ms]
+U_kcc2 = 1e-4     # Maximum KCC2 pump strength [mM/ms]
 U_nkcc1 = 1e-5    # Maximum NKCC1 pump strength [mM/ms]
 
 F = 96485.309     # Faraday constant [faraday]
@@ -85,8 +86,8 @@ axial_resistance = 100   # Axial resistance in all the cell [Ohm * cm]
 membrane_capacitance = 1 # Membrane capacitance [micro Farads/cm2]
 temperature = 23         # Temperature during the simulation [degC]
 
-intial_cli = 24      # Initial intracellular chloride concentration in cell [mM]
-initial_ki = 135     # Initial intracellular potassium concentration in cell [mM]
+intial_cli = 6.9      # Initial intracellular chloride concentration in cell [mM]
+initial_ki = 117     # Initial intracellular potassium concentration in cell [mM]
 initial_nai = 12     # Initial intracellular sodium concentration in cell [mM]
 clo = 130.5          # Extracellular chloride concentration [mM]
 ko = 3.5             # Extracellular potassium concentration [mM]

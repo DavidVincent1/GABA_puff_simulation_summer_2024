@@ -38,7 +38,8 @@ my_cell = Soma(0,
                 unkcc1=p.U_nkcc1)
 
 
-# GABA puff event and simulation ------------------------------
+# Potassic choc event and simulation ------------------------------
+print("Potassic choc simulation\n")
 Potassic_choc_event = choc_potass(my_cell,
                                 clamp=p.clamp,
                                 clamp_amp=p.clamp_amp * mV,
@@ -47,7 +48,8 @@ Potassic_choc_event = choc_potass(my_cell,
                                 skip=p.time_for_stabilization,
                                 choc_time=p.tchoc,
                                 kchoc=p.kchoc,
-                                tauchoc=p.tauchoc)
+                                tauchoc=p.tauchoc,
+                                tdur=p.tdur)
 
 
 tcomp = time.time() - texp
@@ -64,8 +66,8 @@ dataset_icl_soma, dataset_ik_soma, dataset_ina_soma = Potassic_choc_event[3], Po
 
 
 # path for dataset and name of the file-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-name = f"unclamped_somasim_simlen={p.simulation_lenght}_dt=({p.dt1},{p.dt2},{p.dt3})_test.hdf5"
-filepath_h5 = Path.cwd()/"Test_soma"/name
+name = f"unclamped_somasim_simlen={p.simulation_lenght:.2g}_dt=({p.dt1},{p.dt2},{p.dt3})_kcc2={p.U_kcc2:.2g}_nkcc1={p.U_nkcc1:.2g}_gclc2={p.soma_gclc2:.2g}_.hdf5"
+filepath_h5 = Path.cwd()/"Single_compartment\dataset"/name
 
 
 # Saving -------------------------------------------------
